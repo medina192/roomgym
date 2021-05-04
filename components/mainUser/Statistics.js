@@ -13,6 +13,8 @@ import {
   Dimensions,
 } from 'react-native';
 
+import moment from 'moment';
+
 import axios from 'axios';
 
 import TopBar from '../shared/TopBar';
@@ -32,7 +34,10 @@ import {
     StackedBarChart
   } from "react-native-chart-kit";
 
+  import CalendarPicker from 'react-native-calendar-picker';
+
   import { urlServer } from '../../services/urlServer';
+  import  Colors  from '../../colors/colors';
 
 const Drawer = createDrawerNavigator();
 
@@ -59,16 +64,22 @@ const StatisticsScreen = ({navigation}) => {
 
     const [workMuscle, setWorkMuscle] = useState([]);
     const [dataChartPercentage, setDataChartPercentage] = useState([]);
+    const [selectedStartDate, setSelectedStartDate] = useState(null);
+
+    const weekdays = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
+    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+    const onDateChange = (date) => {
+      console.log('date', date._i);
+      setSelectedStartDate(date);
+    }
 
     const screenWidth = Dimensions.get("window").width;
 
     useEffect(() => {
         
         getWorkByMuscle();
-
-
         
-
     }, []);
 
 
@@ -105,21 +116,37 @@ const StatisticsScreen = ({navigation}) => {
       const [typeTimeArray, sum] = getSumTimeExercise(uniqueTypes, arrayWorkByMuscle);
 
 
-      const colorsChartPercentages = ['#f00', '#0f0', '#00f', '#444', '#783412'];
+      const colorsChartPercentages = ['#244EAB', '#FF7F11', '#69A2B0', '#FFFC31', '#03312E'];
       const legendFontColor = "#7F7F7F";
       const legendFontSize = 14;
       const dataChartPercentageTemplate = [];
 
       if(typeTimeArray.length > 5)
       {
-
+        
+        for(let i = 0; i < typeTimeArray.length; i++)
+        {
+          let auxNum = 100 * typeTimeArray[i].time / sum;
+          let num = parseFloat(auxNum.toFixed(2));
+          
+          dataChartPercentageTemplate[i] = {
+            name: '% '+typeTimeArray[i].type,
+            population: num,
+            color: colorsChartPercentages[i],
+            legendFontColor,
+            legendFontSize,
+          }
+        }
+        console.log('data', dataChartPercentageTemplate);
       }
       else{
         for(let i = 0; i < typeTimeArray.length; i++)
         {
+          let auxNum = 100 * typeTimeArray[i].time / sum;
+          let num = parseFloat(auxNum.toFixed(2));
           dataChartPercentageTemplate[i] = {
             name: '% '+typeTimeArray[i].type,
-            population: 100 * typeTimeArray[i].time / sum,
+            population: num,
             color: colorsChartPercentages[i],
             legendFontColor,
             legendFontSize,
@@ -257,6 +284,24 @@ const StatisticsScreen = ({navigation}) => {
         barPercentage: 0.6,
         useShadowColorFromDataset: false // optional
       };
+      const startDate = selectedStartDate ? selectedStartDate.toString() : '';
+
+      //let today = moment();
+      //let day = today.clone().startOf('month');
+      let day = moment("2021-05-05");
+      let customDatesStyles = [];
+      //while(day.add(1, 'day').isSame(today, 'month')) {
+        //console.log('day clone', day.clone());
+        customDatesStyles.push({
+          date: day,
+          
+          // Random colors
+          style: {backgroundColor: '#0f0'},
+          textStyle: {color: 'black'}, // sets the font color
+          containerStyle: [], // extra styling for day container
+          allowDisabled: true, // allow custom style to apply to disabled dates
+        });
+      //}
 
   return (
     <>
@@ -267,45 +312,59 @@ const StatisticsScreen = ({navigation}) => {
                     workMuscle.length > 0 ?
                     (
                         <>
-                        <PieChart
-                            data={dataChartPercentage}
-                            width={screenWidth}
-                            height={230}
-                            chartConfig={chartConfig}
-                            accessor={"population"}
-                            backgroundColor={"transparent"}
-                            paddingLeft={"15"}
-                            center={[0, 0]}
-                            absolute
-                        />
-                        <BarChart
-                            style={{padding: 10, marginRight: 20}}
-                            data={dataBar}
-                            width={screenWidth - 30}
-                            height={220}
-                            yAxisLabel=""
-                            chartConfig={chartConfigbar}
-                            verticalLabelRotation={30}
-                            showBarTops={true}
-                            fromZero={true}
-                            showValuesOnTopOfBars={true}
-                            withHorizontalLabels={false}
-                            center={[5, 50]}
-                            withInnerLines={false}
-                        />
-                        <StackedBarChart
-                            //style={graphStyle}
-                            data={databar2}
-                            width={screenWidth}
-                            height={220}
-                            chartConfig={chartConfigBar2}
-                        />
+                          <View>
+                            <CalendarPicker
+                              weekdays={weekdays}
+                              months={months}
+                              startFromMonday={true}
+                              customDatesStyles={customDatesStyles}
+                              onDateChange={date => onDateChange(date)}
+                            />
+                          </View>
+                          <View>
+          <Text>SELECTED DATE:{ startDate }</Text>
+        </View>
+                          <PieChart
+                              data={dataChartPercentage}
+                              width={screenWidth}
+                              height={230}
+                              chartConfig={chartConfig}
+                              accessor={"population"}
+                              backgroundColor={"transparent"}
+                              paddingLeft={"15"}
+                              center={[0, 0]}
+                              absolute
+                          />
+                          <BarChart
+                              style={{padding: 10, marginRight: 20}}
+                              data={dataBar}
+                              width={screenWidth - 30}
+                              height={220}
+                              yAxisLabel=""
+                              chartConfig={chartConfigbar}
+                              verticalLabelRotation={30}
+                              showBarTops={true}
+                              fromZero={true}
+                              showValuesOnTopOfBars={true}
+                              withHorizontalLabels={false}
+                              center={[5, 50]}
+                              withInnerLines={false}
+                          />
+                          <StackedBarChart
+                              //style={graphStyle}
+                              data={databar2}
+                              width={screenWidth}
+                              height={220}
+                              chartConfig={chartConfigBar2}
+                          />
                         </>
                     )
                     :
                     (
                         <>
-                            <Text>Aun no tienes estadisticas, haz ejercicio para tenerlas¡</Text>
+                          <View style={styles.containerMessage}>
+                            <Text style={styles.textMessage}>Aun no tienes estadisticas, haz ejercicio para tenerlas¡</Text>
+                          </View>
                         </>
                     )
                 }
@@ -319,5 +378,24 @@ const StatisticsScreen = ({navigation}) => {
 const styles = StyleSheet.create({
     mainContainer:{
         flex: 1
+    },
+
+    // text if there is no statistics
+    containerMessage:{
+      padding: 10,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    textMessage:{
+      backgroundColor: Colors.MainBlue,
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '700',
+      padding: 10,
+      borderTopLeftRadius: 8,
+      borderTopRightRadius: 8,
+      borderBottomLeftRadius: 8,
+      borderBottomRightRadius: 8,
     }
 });
