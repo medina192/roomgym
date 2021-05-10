@@ -27,6 +27,7 @@
     "react-native-keychain": "^7.0.0",
     "react-native-modal-datetime-picker": "^9.2.1",
     "react-native-paper": "^4.8.1",
+    "react-native-push-notification": "^7.2.3",
     "react-native-reanimated": "^2.0.0",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^3.1.1",
