@@ -121,8 +121,8 @@ const TrainerScreen = ({navigation}) => {
         }
 
         <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe}>
-            <Text style={styles.textButoonSubscribe}>Suscribirse</Text>
+          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('CreateNotes')}>
+            <Text style={styles.textButoonSubscribe}>Crear nota</Text>
           </TouchableOpacity>
         </View>
 

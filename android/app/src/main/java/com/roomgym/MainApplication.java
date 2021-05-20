@@ -13,7 +13,7 @@ import java.util.List;
 
 import com.facebook.react.bridge.JSIModulePackage; // <- add
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
-import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;  
+
 
 public class MainApplication extends Application implements ReactApplication {
 

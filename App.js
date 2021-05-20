@@ -55,6 +55,7 @@ import MainTrainerScreen from './components/mainTrainer/MainTrainerScreen';
 import ListUsers from './components/mainTrainer/ListUsers';
 import CardUser from './components/mainTrainer/CardUser';
 import CreateRoutines from './components/mainTrainer/routines/CreateRoutines';
+import CreateNotes from './components/mainTrainer/notes/CreateNote';
 
 const Stack = createStackNavigator();
 
@@ -271,6 +272,14 @@ const App = () => {
                 header: () => null
               }}
             />
+            <Stack.Screen 
+              name="CreateNotes"
+              component={CreateNotes}
+              options={{
+                header: () => null
+              }}
+            />
+
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

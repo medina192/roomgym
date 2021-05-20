@@ -18,7 +18,7 @@ import Colors from '../../colors/colors';
 import SideBarUser from '../shared/SideBarUser';
 import BottomBar from '../shared/BottomBarUser';
 
-import PushNotification from "react-native-push-notification";
+
 
 
 const Drawer = createDrawerNavigator();
@@ -34,24 +34,9 @@ export default function MainUserScreen({navigation}) {
 }
 
 
-const showNotification = (title, message) => {
-  PushNotification.localNotification({
-    title: title,
-    message: message
-  });
-}
 
-const handleScheduleNotification = (title, message) => {
-  PushNotification.localNotificationSchedule({
-    title: title,
-    message: message,
-    date: new Date(Date.now() + 5 * 1000)
-  });
-}
 
-const cancelNotification = () => {
-  PushNotification.cancelAllLocalNotifications();
-}
+
 
 
 
@@ -66,21 +51,8 @@ const UserScreen = ({navigation}) => {
     navigation.openDrawer();
   }
 
-  console.log('state');
-  const getNot = () => {
-    console.log('get not');
-    showNotification('hola', 'Notificacion');
-  }
+  
 
-  const getNot5 = () => {
-    console.log('get not5');
-    handleScheduleNotification('hola', 'notification schedule');
-  }
-
-  const cancelNot = () => {
-    console.log('cancel');
-    cancelNotification();
-  }
 
   return (
     <>
@@ -166,23 +138,7 @@ const UserScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ getNot}>
-            <Text style={styles.textButoonSubscribe}>get notification</Text>
-          </TouchableOpacity>
-        </View>
 
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ getNot5}>
-            <Text style={styles.textButoonSubscribe}>notification after 5 seconds</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ cancelNot} activeOpacity={0.5}>
-            <Text style={styles.textButoonSubscribe}>cancell notification</Text>
-          </TouchableOpacity>
-        </View>
 
         </ScrollView>
 
