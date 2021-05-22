@@ -40,6 +40,9 @@ import RNFetchBlob from 'rn-fetch-blob';
 
 import Video, {FilterType} from 'react-native-video';
 
+import Pdf from 'react-native-pdf';
+ 
+
 const Drawer = createDrawerNavigator();
 
 
@@ -60,6 +63,7 @@ export default function CreateNotes() {
 const CreateNotesScreen = ({navigation}) => {
 
 
+
   const serverUrl = urlServer.url;
 
   const [showTextInput, setShowTextInput] = useState(false);
@@ -69,7 +73,8 @@ const CreateNotesScreen = ({navigation}) => {
       fontWeight: '300', // light
       color: '#000000'
   });
-  const REMOTE_IMAGE_PATH = 'http://192.168.0.9:3002/videos/mov_bbb.mp4';
+  //const REMOTE_IMAGE_PATH = 'http://192.168.0.9:3002/videos/mov_bbb.mp4';
+  const REMOTE_IMAGE_PATH = 'http://192.168.0.9:3002/pdf/dieta.pdf';
   useEffect(() => {
 
    /*
@@ -122,11 +127,11 @@ const CreateNotesScreen = ({navigation}) => {
                 buttonPositive: "OK"
               },
             );
-            console.log('resp per', granted);
+     
             if (granted === PermissionsAndroid.RESULTS.GRANTED)
             {
-                console.log('goog');
-                downloadImage();
+                
+                //downloadImage();
             }
             else{
                 console.log('not');
@@ -189,6 +194,50 @@ const CreateNotesScreen = ({navigation}) => {
       });
   };
 
+  const downloadPdf = () => {
+    console.log('hi');
+    // Main function to download the image
+    // https://aboutreact.com/download-image-in-react-native/    image
+    // To add the time suffix in filename
+    let date = new Date();
+    // Image URL which we want to download
+    let image_URL = REMOTE_IMAGE_PATH;    
+    // Getting the extention of the file
+    let ext = getExtention(image_URL);
+    ext = '.' + ext[0];
+    // Get config and fs from RNFetchBlob
+    // config: To pass the downloading related options
+    // fs: Directory path where we want our image to download
+    const { config, fs } = RNFetchBlob;
+
+    let PictureDir = fs.dirs.PictureDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        // Related to the Android only
+        useDownloadManager: true,
+        notification: true,
+        path:
+          PictureDir +
+          '/pdf_' + 
+          Math.floor(date.getTime() + date.getSeconds() / 2) +
+          ext,
+        description: 'pdf',
+      },
+    };
+    console.log('options', options);
+    config(options)
+      .fetch('GET', image_URL)
+      .then(res => {
+        // Showing alert after successful downloading
+        console.log('res --------> ', JSON.stringify(res));
+        alert('pdf Downloaded Successfully.');
+      })
+      .catch(err => {
+          console.log('error ----------------------------------', err);
+      });
+  };
+
   const getExtention = filename => {
     // To get the file extension
     return /[.]/.exec(filename) ?
@@ -226,31 +275,119 @@ const CreateNotesScreen = ({navigation}) => {
         setTextInputValue(text);
   }
   
-  console.log('text', textInputValue);
+
 
   for(let i = 0; i < textInputValue.length; i++)
   {
       console.log('i',textInputValue[i]);
   }
+
+  const createPdf = () => {
+
+    let colorText = currentText.color;
+    let fontWeightText = currentText.fontWeight;
+    let fontSizeText = currentText.fontSize;
+    let inputText = textInputValue;
+
+    axios({
+      method: 'post',
+      url: `${serverUrl}/files/createpdf`,
+      data: {
+        color: colorText,
+        fontWeight: fontWeightText,
+        fontSize: fontSizeText,
+        text: inputText
+      }
+    })
+    .then(function (response) {
+        console.log('routine',response);
+    })
+    .catch(function (error) {
+        console.log('error axios',error);
+    });
+  }
+
+  const downloadPdf1 = () => {
+
+    downloadPdf();
+    
+    /*
+    axios({
+      method: 'get',
+      url: `${serverUrl}/files/downloadfile`,
+    })
+    .then(function (response) {
+        console.log('routine',response);
+    })
+    .catch(function (error) {
+        console.log('error axios',error);
+    });
+    */
+  }
   
+  //const source = {uri:'http://samples.leanpub.com/thereactnativebook-sample.pdf',cache:true};
+  //const source = {uri:'http://192.168.0.9:3002/pdf/dieta.pdf',cache:true};
+  const source = {uri:'https://www.ti.com/lit/ds/symlink/lm555.pdf',cache:true};
+
+  const checkMeasure = (event) => {
+    
+    var {x, y, width, height} = event.nativeEvent.layout;
+
+    console.log('event', height);
+  }
+
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'fff'}}>
         <TopBar navigation={navigation} title={`Bienvenido Usuario`} returnButton={true} />
-        <View style={{height: 200, width: 200, backgroundColor: '#444'}}>
-        <Video source={{uri: "file:///storage/emulated/0/Pictures/image_1621468552407.mp4"}}   // Can be a URL or a local file.
-          style={{ flex: 1 }}
-          controls={true}
-          resizeMode="contain"
-        />
-        </View>
-        <Image width={100} height={50} source={{uri: 'file:///storage/emulated/0/Pictures/image_1621465488852.png',
-                        width: 100, 
-                        height: 100}} />
+
         <ScrollView style={{flex: 1, backgroundColor: '#fff'}}> 
+
+
+        <View 
+        
+                    onLayout={(event) => {
+            checkMeasure(event);
+          }}
+        style={{
+                  width: 300,
+                  height: 'auto',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  marginTop: 25,
+        }}>
+                <Pdf
+                    source={source}
+                    onLoadComplete={(numberOfPages,filePath)=>{
+                        console.log(`number of pages: ${numberOfPages}`);
+                    }}
+                    onPageChanged={(page,numberOfPages)=>{
+                        console.log(`current page: ${page}`);
+                    }}
+                    onError={(error)=>{
+                        console.log(error);
+                    }}
+                    onPressLink={(uri)=>{
+                        console.log(`Link presse: ${uri}`)
+                    }}
+                    style={{
+                      flex:1,
+                      width:Dimensions.get('window').width,
+                      height:Dimensions.get('window').height,
+                    }}/>
+            </View>
+
+
             <View style={styles.containerNote}>
                 <View style={styles.containerNoteShadow}>
                     <View style={styles.note}>
-                        <Text>{textInputValue}</Text>
+                        <Text
+                          style={{
+                            fontWeight: currentText.fontWeight,
+                            fontSize: currentText.fontSize,
+                            color: currentText.color
+                          }}
+                        >{textInputValue}</Text>
                     </View>
                 </View>
             </View>
@@ -295,18 +432,48 @@ const CreateNotesScreen = ({navigation}) => {
                         <TouchableOpacity style={styles.buttonFontWeight} onPress={() => selectFontSize(10)}>
                             <Text style={styles.textBold}>10</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonFontWeight} onPress={() => selectFontSize(16)}>
-                            <Text style={styles.textBold}>16</Text>
+                        <TouchableOpacity style={styles.buttonFontWeight} onPress={() => selectFontSize(20)}>
+                            <Text style={styles.textBold}>20</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonFontWeight} onPress={() => selectFontSize(22)}>
-                            <Text style={styles.textBold}>22</Text>
+                        <TouchableOpacity style={styles.buttonFontWeight} onPress={() => selectFontSize(28)}>
+                            <Text style={styles.textBold}>28</Text>
                         </TouchableOpacity>
-                    </View>
+            </View>
+            <TouchableOpacity onPress={createPdf}  style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
+              <Text style={{color:'#fff', fontSize: 16, fontWeight: '700', textAlign:'center'}}>Crear Pdf</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={downloadPdf1} style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
+              <Text style={{color:'#fff', fontSize: 16, fontWeight: '700', textAlign: 'center'}}>Descargar Pdf</Text>
+            </TouchableOpacity>
+
+            <View style={{height: 200, width: 200, backgroundColor: '#444'}}>
+        <Video source={{uri: "file:///storage/emulated/0/Pictures/image_1621468552407.mp4"}}   // Can be a URL or a local file.
+          style={{ flex: 1 }}
+          controls={true}
+          resizeMode="contain"
+        />
+        </View>
+        <Image width={100} height={50} source={{uri: 'file:///storage/emulated/0/Pictures/image_1621465488852.png',
+                        width: 100, 
+                        height: 100}} />
+
         </ScrollView>
+        <View style={{height: 200, width: 200, backgroundColor: '#444'}}>
+        <Video source={{uri: "file:///storage/emulated/0/Pictures/image_1621468552407.mp4"}}   // Can be a URL or a local file.
+          style={{ flex: 1 }}
+          controls={true}
+          resizeMode="contain"
+        />
+        </View>
         <BottomBar navigation={navigation}/>
     </SafeAreaView>
   );
+
+
 };
+
+
+
 
 const styles = StyleSheet.create({
     //note view
