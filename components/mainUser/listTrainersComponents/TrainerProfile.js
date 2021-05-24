@@ -3,7 +3,8 @@ import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 
 import axios from 'axios';
@@ -23,6 +24,7 @@ import BottomBar from '../../shared/BottomBarUser';
 import { saveIdRelation } from '../../../store/actions/actionsReducer';
 
 import { urlServer } from '../../../services/urlServer';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const Drawer = createDrawerNavigator();
 
@@ -47,9 +49,12 @@ const TrainerProfileScreen = ({navigation}) => {
     userSubscribedStatus: false
   });  
   const [disabled, setDisabled] = useState(false);
+  const [documents, setDocuments] = useState([]);
+
 
   useEffect(() => {
     verifyRelation();
+    getTrainerDocuments();
   }, []);
 
   const verifyRelation = () => {
@@ -58,6 +63,8 @@ const TrainerProfileScreen = ({navigation}) => {
       url: `${serverUrl}/relations/getrelation/${user.email}${trainer.email}`,
     })
     .then(function (response) {
+
+      console.log('response.data.resp.length, ', response.data.resp);
 
       if(response.data.resp.length > 0)
       {
@@ -151,9 +158,11 @@ const TrainerProfileScreen = ({navigation}) => {
     });
   }
 
+
   const sendMessage = () => {
     navigation.navigate('MessageUser');
   }
+
 
   const sendEmail = () => {
     axios({
@@ -178,10 +187,30 @@ const TrainerProfileScreen = ({navigation}) => {
     });
   }
 
+
+  const getTrainerDocuments = async() => {
+    axios({
+      method: 'post',
+      url: `${serverUrl}/files/getdocuments`,
+      data: {
+        idEntrenador: trainer.idusuario,
+      }
+    })
+    .then(function (response) {
+      console.log('response', response.data.resp); 
+      setDocuments(response.data.resp);
+    })
+    .catch(function (error) {
+        console.log('error axios',error);
+    });
+  }
+
+
   return (
     <>
        <TopBar navigation={navigation} title={trainer.nombres} returnButton={true}/>
-       <View style={styles.containerTrainerCard}>
+        <ScrollView>
+        <View style={styles.containerTrainerCard}>
           <View style={styles.trainerCard}>
             <View style={styles.containerImage_Name}>
                 <Icon name="user-o" size={24} style={styles.iconImage} color="#fff" />
@@ -244,8 +273,80 @@ const TrainerProfileScreen = ({navigation}) => {
 
            } )()
            }
+           <View>
+             {
+               documents.length > 0 ?
+               (
+                <View>
+                  <View>
+                    <Text style={{fontSize: 16, fontWeight: '700', marginTop: 10, marginBottom: 5}}>Videos</Text>
+                    {
+                      documents.map( (document, indexDocument) => {
+
+                        if(document.tipo === 'video')
+                        {
+                          const index___ = document.nombreDocumento.search('___');
+                          const justName = document.nombreDocumento.slice(0, index___);
+                          return(
+                            <TouchableOpacity 
+                              onPress={ () => navigation.navigate('WatchVideo',{url: document.url, name: document.nombreDocumento})}
+                              style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
+                              <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
+                            </TouchableOpacity>
+                          )
+                        }
+                      })
+                    }
+                  </View>
+                  <View>
+                    <Text  style={{fontSize: 16, fontWeight: '700', marginTop: 10, marginBottom: 5}}>Pdfs</Text>
+                    {
+                      documents.map( (document, indexDocument) => {
+
+                        if(document.tipo === 'pdf')
+                        {
+                          const index___ = document.nombreDocumento.search('___');
+                          const justName = document.nombreDocumento.slice(0, index___);
+                          return(
+                            <TouchableOpacity 
+                              onPress={ () => navigation.navigate('WatchPdf',{url: document.url, name: document.nombreDocumento})}
+                              style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
+                              <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
+                            </TouchableOpacity>
+                          )
+                        }
+                      })
+                    }
+                  </View>
+                  <View>
+                    <Text  style={{fontSize: 16, fontWeight: '700', marginTop: 10, marginBottom: 5}}>Imagenes</Text>
+                    {
+                      documents.map( (document, indexDocument) => {
+
+                        if(document.tipo === 'image')
+                        {
+                          const index___ = document.nombreDocumento.search('___');
+                          const justName = document.nombreDocumento.slice(0, index___);
+                          return(
+                            <Image width={100} height={50} source={{uri: document.url,
+                            width: 300, 
+                            height: 300}} />
+                          )
+                        }
+                      })
+                    }
+                  </View>
+                </View>
+               )
+               :
+               (
+                 <Text>El entrenador aún no tiene documentos</Text>
+               )
+             }
+           </View>
         </View>
-        <BottomBar navigation={navigation}/>
+        </ScrollView>
+       <BottomBar navigation={navigation}/>
     </>
   );
 };

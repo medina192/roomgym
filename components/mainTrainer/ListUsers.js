@@ -61,7 +61,9 @@ const ListUsersScreen = ({navigation}) => {
 
   const ListMyUsers = async() => {
     try {
+      console.log('users');
       const res = await axios({method: 'get',url: `${serverUrl}/relations/getmyusers/${trainerInformation.email}`});
+      console.log('users2');
       //console.log(res.data.resp);
       //setlistTrainers(response.data.resp);
       setUsersLoaded(true);

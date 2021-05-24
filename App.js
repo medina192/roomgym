@@ -56,6 +56,10 @@ import ListUsers from './components/mainTrainer/ListUsers';
 import CardUser from './components/mainTrainer/CardUser';
 import CreateRoutines from './components/mainTrainer/routines/CreateRoutines';
 import CreateNotes from './components/mainTrainer/notes/CreateNote';
+import CreatePdf from './components/mainTrainer/notes/CreatePdf';
+import WatchPdf from './components/mainUser/documents/WatchPdf';
+import WatchVideo from './components/mainUser/documents/WatchVideo';
+
 
 const Stack = createStackNavigator();
 
@@ -279,7 +283,27 @@ const App = () => {
                 header: () => null
               }}
             />
-
+            <Stack.Screen 
+              name="CreatePdf"
+              component={CreatePdf}
+              options={{
+                header: () => null
+              }}
+            />
+            <Stack.Screen 
+              name="WatchPdf"
+              component={WatchPdf}
+              options={{
+                header: () => null
+              }}
+            />
+            <Stack.Screen 
+              name="WatchVideo"
+              component={WatchVideo}
+              options={{
+                header: () => null
+              }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

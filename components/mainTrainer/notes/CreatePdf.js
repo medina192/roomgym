@@ -55,12 +55,12 @@ var db = openDatabase({ name: 'SchoolDatabase.db' });
 const Drawer = createDrawerNavigator();
 
 
-export default function CreateNotes() {
+export default function CreatePdf() {
 
   return (
     <>
       <Drawer.Navigator drawerContent={(props) => <SideBarTrainer {...props} />}>
-        <Drawer.Screen name="CreateNotes" component={CreateNotesScreen}/>
+        <Drawer.Screen name="CreatePdf" component={CreatePdfScreen}/>
       </Drawer.Navigator>
     </>
   );
@@ -68,13 +68,13 @@ export default function CreateNotes() {
 
 
 
-const CreateNotesScreen = ({navigation}) => {
+const CreatePdfScreen = ({navigation}) => {
 
 
   const dispatch = useDispatch();
 
   const T_trainer = useSelector(state => state.T_trainer);
-  console.log('create note', T_trainer);
+
 
   const serverUrl = urlServer.url;
 
@@ -82,12 +82,13 @@ const CreateNotesScreen = ({navigation}) => {
   const [textInputValue, setTextInputValue] = useState('');
   const [nameInputValue, setNameInputValue] = useState('');
   const [currentText, setCurrentText] = useState({
-      fontSize: 15,
+      fontSize: 10,
       fontWeight: '300', // light
       color: '#000000'
   });
   const [state, setState] = useState(false);
   const [paragraphs, setParagraphs] = useState([]);
+  const [pdfCreated, setPdfCreated] = useState(false);
 
 
   //const REMOTE_IMAGE_PATH = 'http://192.168.0.9:3002/videos/mov_bbb.mp4';
@@ -321,7 +322,7 @@ const CreateNotesScreen = ({navigation}) => {
   const createPdf = () => {
 
 
-    if(nameInputValue == '')
+    if(!nameInputValue == '')
     {
       if(paragraphs.length > 0)
       {
@@ -330,16 +331,21 @@ const CreateNotesScreen = ({navigation}) => {
           url: `${serverUrl}/files/createpdf`,
           data: {
             paragraphs,
+            idTrainer: T_trainer.idusuario,
             nameFile: nameInputValue,
-            nameTrainer: T_trainer.nombres,
-            lastNameTrainer: T_trainer.apellidos,
-            public: 0,
-            showInPerfil: 0,
-            idTrainer: T_trainer.idusuario
+            trainerName: T_trainer.nombres,
+            trainerLastName: T_trainer.apellidos,
+            publicPdf: true,
+            showInPerfil: false,
           }
         })
         .then(function (response) {
             console.log('pdf',response);
+            setPdfCreated(true);
+
+            setTimeout(() => {
+                setPdfCreated(false);
+            }, 3000);
         })
         .catch(function (error) {
             console.log('error axios',error);
@@ -503,6 +509,12 @@ const CreateNotesScreen = ({navigation}) => {
       edit: false
     }
 
+    setCurrentText({
+        fontSize: 10,
+        fontWeight: '300', // light
+        color: '#000000'
+    });
+
     setParagraphs(paragraphs);
     setShowTextInput(false);
     setTextInputValue('');
@@ -523,41 +535,7 @@ const CreateNotesScreen = ({navigation}) => {
         <TopBar navigation={navigation} title={`Bienvenido Usuario`} returnButton={true} />
 
         <ScrollView style={{flex: 1, backgroundColor: '#fff'}}> 
-
-
-        <View 
-        
-                    onLayout={(event) => {
-            checkMeasure(event);
-          }}
-        style={{
-                  width: 300,
-                  height: 'auto',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  marginTop: 25,
-        }}>
-                <Pdf
-                    source={source}
-                    onLoadComplete={(numberOfPages,filePath)=>{
-                        console.log(`number of pages: ${numberOfPages}`);
-                    }}
-                    onPageChanged={(page,numberOfPages)=>{
-                        console.log(`current page: ${page}`);
-                    }}
-                    onError={(error)=>{
-                        console.log(error);
-                    }}
-                    onPressLink={(uri)=>{
-                        console.log(`Link presse: ${uri}`)
-                    }}
-                    style={{
-                      flex:1,
-                      width:Dimensions.get('window').width,
-                      height:Dimensions.get('window').height,
-                    }}/>
-            </View>
-
+            <Text style={{fontSize: 16, marginLeft: 3, marginTop: 10, textAlign: 'center'}}>Nombre pdf</Text>
             <View style={styles.containerNameInput}>
                 <View style={styles.containerBorderNameInput}>
                     <TextInput 
@@ -643,8 +621,6 @@ const CreateNotesScreen = ({navigation}) => {
                     </View>
                 </View>
             </View>
-            <SavedNote />
-            <EditNote />
 
             <View style={styles.containerEditOptions}>
                 
@@ -666,6 +642,18 @@ const CreateNotesScreen = ({navigation}) => {
                     <>
                     </>
                   )
+                }
+
+                {
+                    pdfCreated ? 
+                    (
+                        <Text style={{backgroundColor: '#00b', color: '#fff', padding: 15, margin: 15}}>Pdf Crated</Text>
+                    )
+                    :
+                    (
+                        <>
+                        </>
+                    )
                 }
 
                 <Text>Añadir</Text>
@@ -719,47 +707,8 @@ const CreateNotesScreen = ({navigation}) => {
             <TouchableOpacity onPress={downloadPdf1} style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
               <Text style={{color:'#fff', fontSize: 16, fontWeight: '700', textAlign: 'center'}}>Descargar Pdf</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={insertData} style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
-              <Text style={{color:'#fff', fontSize: 16, fontWeight: '700', textAlign: 'center'}}>Insert data</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={getData} style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
-              <Text style={{color:'#fff', fontSize: 16, fontWeight: '700', textAlign: 'center'}}>conseguir datos</Text>
-            </TouchableOpacity>
-
-
-        {
-          /*
-                      <View style={{height: 200, width: 200, backgroundColor: '#444'}}>
-        <Video source={{uri: "file:///storage/emulated/0/Pictures/image_1621468552407.mp4"}}   // Can be a URL or a local file.
-          style={{ flex: 1 }}
-          controls={true}
-          resizeMode="contain"
-        />
-        </View>
-          */
-        }
-        <Image width={100} height={50} source={{uri: 'file:///storage/emulated/0/Pictures/image_1621465488852.png',
-                        width: 100, 
-                        height: 100}} />
-
-
 
         </ScrollView>
-        
-          {
-            /*
-            <View style={{height: 200, width: 200, backgroundColor: '#444'}}>
-                    <Video source={{uri: "file:///storage/emulated/0/Pictures/image_1621468552407.mp4"}}   // Can be a URL or a local file.
-          style={{ flex: 1 }}
-          controls={true}
-          resizeMode="contain"
-        />
-                </View>
-            */
-          }
-
-
-
         <BottomBar navigation={navigation}/>
     </SafeAreaView>
   );
@@ -776,7 +725,8 @@ const styles = StyleSheet.create({
     containerNameInput:{
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      marginTop: 5
     },
     containerBorderNameInput:{
       borderBottomWidth: 2,
