@@ -26,6 +26,11 @@ import { saveIdRelation } from '../../../store/actions/actionsReducer';
 import { urlServer } from '../../../services/urlServer';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { openDatabase } from 'react-native-sqlite-storage';
+
+
+const db = openDatabase({ name: 'roomGym.db' });
+
 const Drawer = createDrawerNavigator();
 
 export default function TrainerProfile() {
@@ -50,12 +55,42 @@ const TrainerProfileScreen = ({navigation}) => {
   });  
   const [disabled, setDisabled] = useState(false);
   const [documents, setDocuments] = useState([]);
+  const [downloadedFiles, setDownloadedFiles] = useState({
+    loaded: false,
+    files: []
+  });
+  const [state, setState] = useState(false);
 
 
   useEffect(() => {
     verifyRelation();
     getTrainerDocuments();
+    getDownloadedFiles();
   }, []);
+
+  const getDownloadedFiles = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM UserFiles',
+        [],
+        (tx, results) => {
+          var temp = [];
+          for (let i = 0; i < results.rows.length; ++i)
+          {
+            temp.push(results.rows.item(i));
+            console.log('results---', results.rows.item(i));
+          }
+          setDownloadedFiles({
+            loaded: true,
+            files: temp
+          }); 
+        }
+      );
+ 
+    });
+  }
+
+  console.log('set', downloadedFiles.files[0]);
 
   const verifyRelation = () => {
     axios({
@@ -64,7 +99,7 @@ const TrainerProfileScreen = ({navigation}) => {
     })
     .then(function (response) {
 
-      console.log('response.data.resp.length, ', response.data.resp);
+      //console.log('response.data.resp.length, ', response.data.resp);
 
       if(response.data.resp.length > 0)
       {
@@ -151,6 +186,7 @@ const TrainerProfileScreen = ({navigation}) => {
         state_subscription: 0,
         userSubscribedStatus: true
       });
+      setState(!state);
       
     })
     .catch(function (error) {
@@ -275,7 +311,7 @@ const TrainerProfileScreen = ({navigation}) => {
            }
            <View>
              {
-               documents.length > 0 ?
+               documents.length > 0 && downloadedFiles.loaded ?
                (
                 <View>
                   <View>
@@ -287,11 +323,46 @@ const TrainerProfileScreen = ({navigation}) => {
                         {
                           const index___ = document.nombreDocumento.search('___');
                           const justName = document.nombreDocumento.slice(0, index___);
+
+                          let downloadedFileBoolean = false;
+                          let downloadedFile = {};
+
+                          //console.log('jjjjjjjjjj',downloadedFiles.files.length);
+
+                          for(let i = 0; i < downloadedFiles.files.length; i++)
+                          {
+                            //console.log('jjjjjjjjjj',downloadedFiles.files[i].idDocumentMysql);
+                            
+                            console.log('---------------------------------------------------------');
+                            console.log('local ', downloadedFiles.files[i].idDocumentMysql, '   ', 'server', document.idDocumentos);
+                            console.log('---------------------------------------------------------');
+                            if(downloadedFiles.files[i].idDocumentMysql == document.idDocumentos)
+                            {
+                              console.log('if');
+                              downloadedFileBoolean = true;
+                              downloadedFile = downloadedFiles.files[i];
+                              break;
+                            }
+                            
+                          }
+
                           return(
                             <TouchableOpacity 
-                              onPress={ () => navigation.navigate('WatchVideo',{url: document.url, name: document.nombreDocumento})}
+                              onPress={ () => navigation.navigate('WatchVideo',{document, downloadedFile, downloadedFileBoolean})}
                               style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
                               <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
+                              <View>
+                                {
+                                  downloadedFileBoolean  ?
+                                  (
+                                      <Text style={{backgroundColor: '#fff', padding: 5, color: Colors.MainBlue}}>Descargado</Text>
+                                  )
+                                  :
+                                  (
+                                      <Text style={{backgroundColor: '#fff', padding: 5, color: Colors.MainBlue}}>No Descargado</Text>
+                                  )
+                                }
+                              </View>
                             </TouchableOpacity>
                           )
                         }

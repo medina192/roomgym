@@ -8,6 +8,7 @@ import {
   TextInput,
   Button,
   Switch,
+  Image,
 } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -28,6 +29,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 
 import { urlServer } from '../../../services/urlServer';
+
+import Video, {FilterType} from 'react-native-video';
 
 const Drawer = createDrawerNavigator();
 
@@ -84,7 +87,7 @@ const TrainerScreen = ({navigation}) => {
       else{
         if(resp.uri)
         { 
-          console.log(resp);
+          console.log('photo',resp);
           
           setImageAdded({
             boolean: true,
@@ -166,7 +169,7 @@ const TrainerScreen = ({navigation}) => {
       else{
         if(resp.uri)
         { 
-          console.log(resp);
+          console.log('gallery ',resp);
           
           setImageAdded({
             boolean: true,
@@ -391,7 +394,13 @@ const TrainerScreen = ({navigation}) => {
               {
                 imageAdded.boolean ? 
                 (
-                  <Text>Has añadido una imagen exitosamente</Text>
+                  <>
+                          <Image width={100} height={50} source={{uri: imageAdded.object.uri,
+                            width: 300, 
+                            height: 300}} />
+
+                    <Text>Has añadido una imagen exitosamente</Text>
+                  </>
                 )
                 :
                 (
@@ -427,7 +436,7 @@ const TrainerScreen = ({navigation}) => {
                   <TouchableOpacity
                       onPress={savePhoto}
                       style={styles.containerIconButtonAdd}>
-                      <Icon name="check" size={24} style={styles.iconButtonAdd} color="#fff" />
+                      <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
                   </TouchableOpacity>
             </View>              
 
@@ -475,7 +484,16 @@ const TrainerScreen = ({navigation}) => {
               {
                 videoAdded.boolean ? 
                 (
+                  <>            
+                  <View style={{height: 200, width: 200, backgroundColor: '#444'}}>
+                                  <Video source={{uri: videoAdded.object.uri}}   // Can be a URL or a local file.
+                        style={{ flex: 1 }}
+                        //controls={true}
+                        resizeMode="contain"
+                      />
+                  </View>
                   <Text>Has añadido un video exitosamente</Text>
+                  </>
                 )
                 :
                 (
@@ -511,7 +529,7 @@ const TrainerScreen = ({navigation}) => {
                   <TouchableOpacity
                       onPress={saveVideo}
                       style={styles.containerIconButtonAdd}>
-                      <Icon name="check" size={24} style={styles.iconButtonAdd} color="#fff" />
+                      <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
                   </TouchableOpacity>
             </View>              
 

@@ -23,19 +23,46 @@ import RNFetchBlob from 'rn-fetch-blob';
 
 import Video, {FilterType} from 'react-native-video';
 
+import { openDatabase } from 'react-native-sqlite-storage';
+
+
+const db = openDatabase({ name: 'roomGym.db' });
+
 
 const WatchVideo = ({navigation, route}) => {
 
+  const [urlPdf, seturlPdf] = useState('');
+
+  useEffect(() => {
+    if(route.params.downloadedFileBoolean)
+    {
+
+      console.log('--------------------------------------------------------------');
+      console.log('if', urlPdf);
+      seturlPdf(route.params.downloadedFile.urlInPhone);
+    }
+    else{
+      console.log('--------------------------------------------------------------');
+      const urlPdf = route.params.document.url;
+      console.log('else', urlPdf);
+      seturlPdf(route.params.document.url);
+    }
+    
+  }, [])
 
     const serverUrl = urlServer.url;
 
-    console.log('url', route.params.name);
-    const urlPdf = route.params.url;
+    console.log('down', route.params.downloadedFile);
+    console.log('down', route.params.downloadedFileBoolean);
+
+
+
     const source = {uri: urlPdf,cache:true};
+    console.log(route.params.document);
     //const source = {uri:'https://www.ti.com/lit/ds/symlink/lm555.pdf',cache:true};
 
 
-    const urlInServer = `http://192.168.0.9:3002/videos/${route.params.name}`;
+    const urlInServer = `http://192.168.0.9:3002/videos/${route.params.document.nombreDocumento}`;
 
     const downloadPdf = () => {
         console.log('hi');
@@ -74,7 +101,9 @@ const WatchVideo = ({navigation, route}) => {
           .then(res => {
             // Showing alert after successful downloading
             console.log('res --------> ', JSON.stringify(res));
-            alert('pdf Downloaded Successfully.');
+            const pathLocalDocument = `file://${res.data}`;
+            insertData(pathLocalDocument );
+            alert('video Downloaded Successfully.');
           })
           .catch(err => {
               console.log('error ----------------------------------', err);
@@ -87,6 +116,53 @@ const WatchVideo = ({navigation, route}) => {
                  /[^.]+$/.exec(filename) : undefined;
       };
     
+      const insertData = (path) => {
+        db.transaction(function (tx) {
+          tx.executeSql(
+            'INSERT INTO UserFiles (nameTrainer, nameDocument, type, idTrainerMysql, idDocumentMysql, urlInPhone) VALUES (?,?,?,?,?,?)',
+            [route.params.document.nombreEntrenador,
+               route.params.document.nombreDocumento, 
+               route.params.document.tipo,
+               route.params.document.idEntrenador, 
+              route.params.document.idDocumentos, 
+              path],
+            (tx, results) => {
+              //console.log('Results', results);
+              console.log('tx', tx);
+              getData();
+              if (results.rowsAffected > 0) {
+                Alert.alert('Data Inserted Successfully....');
+              } else Alert.alert('Failed....');
+            },(error => {
+              console.log('error', error);
+            })
+          );
+        });
+      }
+
+      const getData = () => {
+
+        db.transaction((tx) => {
+          tx.executeSql(
+            'SELECT * FROM UserFiles',
+            [],
+            (tx, results) => {
+              var temp = [];
+              for (let i = 0; i < results.rows.length; ++i)
+              {
+                temp.push(results.rows.item(i));
+                console.log('results---', results.rows.item(i));
+              }
+            }
+          );
+     
+        });
+      }
+
+      getData();
+
+
+      console.log('uuuuuuuuuuuuu', urlPdf);
 
   return (
     <>
@@ -98,16 +174,28 @@ const WatchVideo = ({navigation, route}) => {
             <Text style={{color: '#fff', fontWeight: '700', fontSize: 16}}>Descargar</Text>
         </TouchableOpacity>
 
-        <View style={{flex: 1}}>
-        <Video source={{uri: urlInServer}}   // Can be a URL or a local file.
-          style={{ flex: 1 }}
-          controls={true}
-          resizeMode="contain"
-        />
-        </View>
+        {
+          (!urlPdf == '') ? 
+          (
+            <View style={{flex: 1}}>
+  
+            <Video source={source}   // Can be a URL or a local file.
+              style={{ flex: 1 }}
+              controls={true}
+              resizeMode="contain"
+            />
+            </View>
+          )
+          :
+          (
+            <>
+            </>
+          )
+        }
 
     </>
   );
+
 };
 
 export default WatchVideo;

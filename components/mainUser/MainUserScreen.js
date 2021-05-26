@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ImageBackground,
   ScrollView,
+  Image,
+  Dimensions,
 } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -18,8 +20,19 @@ import Colors from '../../colors/colors';
 import SideBarUser from '../shared/SideBarUser';
 import BottomBar from '../shared/BottomBarUser';
 
+import DocumentPicker from 'react-native-document-picker';
+
+import Pdf from 'react-native-pdf';
+
+import RNFetchBlob from 'rn-fetch-blob';
+
+import axios from 'axios';
 
 
+
+import { openDatabase } from 'react-native-sqlite-storage';
+
+const db = openDatabase({ name: 'roomGym.db' });
 
 const Drawer = createDrawerNavigator();
 
@@ -52,7 +65,193 @@ const UserScreen = ({navigation}) => {
   }
 
   
+  const pickDocument = async () => {
+    // Pick a single file
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.images   ],
+      });
+      console.log(
+        res.uri,
+        res.type, // mime type
+        res.name,
+        res.size
+      );
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker, exit any dialogs or menus and move on
+      } else {
+        throw err;
+      }
+    }
 
+    // Pick multiple files
+    try {
+      const results = await DocumentPicker.pickMultiple({
+        type: [DocumentPicker.types.pdf],
+      });
+      for (const res of results) {
+        console.log(
+          res.uri,
+          res.type, // mime type
+          res.name,
+          res.size
+        );
+      }
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker, exit any dialogs or menus and move on
+      } else {
+        throw err;
+      }
+    }
+  }
+  const source = {uri: 'content://com.android.providers.downloads.documents/document/1253',cache:true};
+
+  const readPdf = () => {
+    let data = ''
+    RNFetchBlob.fs.readStream(
+        // file path
+        'content://com.android.providers.downloads.documents/document/1253',
+        // encoding, should be one of `base64`, `utf8`, `ascii`
+        'base64',
+        // (optional) buffer size, default to 4096 (4095 for BASE64 encoded data)
+        // when reading file in BASE64 encoding, buffer size must be multiples of 3.
+        4095)
+    .then((ifstream) => {
+        console.log('ifstream', ifstream);
+        //const formData = new FormData();
+        //formData.append('file', ifstream);
+        data = ifstream;
+
+
+
+
+
+
+
+
+
+        ifstream.open()
+        ifstream.onData((chunk) => {
+          // when encoding is `ascii`, chunk will be an array contains numbers
+          // otherwise it will be a string
+          data += chunk
+        })
+        ifstream.onError((err) => {
+          console.log('oops', err)
+        })
+        ifstream.onEnd(() => {
+          //<Image source={{ uri : 'data:image/png,base64' + data }}
+          console.log('end');
+        });
+    });
+
+    
+    setTimeout(() => {
+      //console.log('data', data);
+      aucFun(data);
+    }, 3000);
+
+    const aucFun = async(data1) => {
+
+      const fileToUpload = {
+        uri: 'content://com.android.providers.downloads.documents/document/1253',
+        type: 'application/pdf',
+        name: 'ooooooooo'
+      }
+
+        const formData = new FormData();
+        formData.append('file', fileToUpload);
+        console.log('form', formData);
+        
+      try {
+        const resp = await axios({
+          method: 'post',
+          url: 'http://192.168.0.9:3002/files/savefile',
+          data: formData
+        });
+        console.log('resp', resp);
+      } catch (error) {
+        console.log('error try', error); 
+      }
+    }
+  }
+
+
+
+  /// sql litre _______________________________________________________________---
+
+  useEffect(() => {
+    const createTable = () => {
+      db.transaction(function (txn) {
+        txn.executeSql(
+          //"SELECT name FROM sqlite_master WHERE type='table' AND name='Student_Table'",
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='UserFiles'",
+          [],
+          function (tx, res) {
+            console.log('item:', res.rows.length);
+            console.log('tx', tx);
+            
+            if (res.rows.length == 0) {
+              txn.executeSql('DROP TABLE IF EXISTS UserFiles', []);
+              txn.executeSql(
+                'CREATE TABLE IF NOT EXISTS UserFiles(id INTEGER PRIMARY KEY AUTOINCREMENT, nameTrainer VARCHAR(30), nameDocument VARCHAR(30), type VARCHAR(30), idTrainerMysql INT(15), idDocumentMysql INT(15), urlInPhone VARCHAR(255))',
+                []
+              );
+            }
+            
+          }
+        );
+      })
+
+    };
+
+    createTable();
+  }, [])
+
+
+  const insertData = () => {
+    db.transaction(function (tx) {
+      tx.executeSql(
+        'INSERT INTO UserFiles (nameDocument, idTrainerMysql, idDocumentMysql, urlInPhone) VALUES (?,?,?,?)',
+        ['jo', 1, 2, 'jdhfj'],
+        (tx, results) => {
+          console.log('Results', results);
+          console.log('tx', tx);
+          if (results.rowsAffected > 0) {
+            Alert.alert('Data Inserted Successfully....');
+          } else Alert.alert('Failed....');
+        }
+      );
+    });
+  }
+
+  const getData = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM UserFiles',
+        [],
+        (tx, results) => {
+          var temp = [];
+          console.log('results', results);
+          for (let i = 0; i < results.rows.length; ++i)
+          {
+            temp.push(results.rows.item(i));
+            console.log('results---', results.rows.item(i));
+          }
+
+
+ 
+        }
+      );
+ 
+    });
+  }
+
+
+  //UPDATE users SET first_name = ? , last_name = ? WHERE id = ?', ["Doctor", "Strange", 3]
+  //DELETE FROM users WHERE id = ?', [4]
 
   return (
     <>
@@ -138,7 +337,61 @@ const UserScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.containerButtonSubscribe}>
+          <TouchableOpacity style={styles.buttonSubscribe} onPress={ pickDocument}>
+            <Text style={styles.textButoonSubscribe}>open document</Text>
+          </TouchableOpacity>
+        </View>
 
+        <View style={styles.containerButtonSubscribe}>
+          <TouchableOpacity style={styles.buttonSubscribe} onPress={ readPdf}>
+            <Text style={styles.textButoonSubscribe}>read document</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.containerButtonSubscribe}>
+          <TouchableOpacity style={styles.buttonSubscribe} onPress={ insertData }>
+            <Text style={styles.textButoonSubscribe}>Inser data sql lite</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.containerButtonSubscribe}>
+          <TouchableOpacity style={styles.buttonSubscribe} onPress={ getData }>
+            <Text style={styles.textButoonSubscribe}>get data sql lite</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Image width={100} height={50} source={{uri: 'content://com.android.providers.downloads.documents/document/1247',
+                            width: 300, 
+                            height: 300}} />
+
+<View 
+        
+        style={{
+            flex:1,
+            width:Dimensions.get('window').width,
+            height:Dimensions.get('window').height,
+        }}>
+        <Pdf
+            source={source}
+            onLoadComplete={(numberOfPages,filePath)=>{
+                console.log(`number of pages: ${numberOfPages}`);
+            }}
+            onPageChanged={(page,numberOfPages)=>{
+                console.log(`current page: ${page}`);
+            }}
+            onError={(error)=>{
+                console.log(error);
+            }}
+            onPressLink={(uri)=>{
+                console.log(`Link presse: ${uri}`)
+            }}
+            style={{
+            flex:1,
+            width:Dimensions.get('window').width,
+            height:Dimensions.get('window').height,
+            }}/>
+        </View>
 
         </ScrollView>
 

@@ -55,6 +55,10 @@ const SideBarUser = ({navigation}) => {
                     <Icon name="bar-chart-o" size={24} style={styles.iconLink} color="#fff" />
                     <Text style={styles.textLink}>Estadísticas</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('UserDocuments')}>
+                    <Icon name="file-o" size={24} style={styles.iconLink} color="#fff" />
+                    <Text style={styles.textLink}>Documentos descargados</Text>
+                </TouchableOpacity>
             </View>
             <View style={styles.containerLine}>
                 <View style={styles.line}></View>

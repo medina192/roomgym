@@ -59,6 +59,7 @@ import CreateNotes from './components/mainTrainer/notes/CreateNote';
 import CreatePdf from './components/mainTrainer/notes/CreatePdf';
 import WatchPdf from './components/mainUser/documents/WatchPdf';
 import WatchVideo from './components/mainUser/documents/WatchVideo';
+import UserDocuments from './components/mainUser/documents/UserDocuments';
 
 
 const Stack = createStackNavigator();
@@ -300,6 +301,13 @@ const App = () => {
             <Stack.Screen 
               name="WatchVideo"
               component={WatchVideo}
+              options={{
+                header: () => null
+              }}
+            />
+            <Stack.Screen 
+              name="UserDocuments"
+              component={UserDocuments}
               options={{
                 header: () => null
               }}
