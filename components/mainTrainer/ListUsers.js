@@ -3,13 +3,6 @@ import {
   StyleSheet,
   View,
   Text,
-  StatusBar,
-  TextInput,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Image,
-  ScrollView,
   FlatList,
 } from 'react-native';
 
@@ -63,12 +56,12 @@ const ListUsersScreen = ({navigation}) => {
     try {
       console.log('users');
       const res = await axios({method: 'get',url: `${serverUrl}/relations/getmyusers/${trainerInformation.email}`});
-      console.log('users2');
+      console.log('users2', res);
       //console.log(res.data.resp);
       //setlistTrainers(response.data.resp);
       setUsersLoaded(true);
       setlistUsers(res.data.resp);
- 
+
      
       /*
       for(let i = 0; i < users.length; i++)

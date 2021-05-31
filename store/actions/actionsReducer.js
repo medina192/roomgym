@@ -100,3 +100,20 @@ export const saveRoutine_T = (routine) => {
         }
     }
 }
+
+
+export const changeState = (state) => {
+    return {
+        type: types.changeState,
+        payload: {
+            state
+        }
+    }
+}
+
+
+export const clearState = () => {
+    return {
+        type: types.clearState
+    }
+}

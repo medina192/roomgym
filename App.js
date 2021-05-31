@@ -60,6 +60,9 @@ import CreatePdf from './components/mainTrainer/notes/CreatePdf';
 import WatchPdf from './components/mainUser/documents/WatchPdf';
 import WatchVideo from './components/mainUser/documents/WatchVideo';
 import UserDocuments from './components/mainUser/documents/UserDocuments';
+import CreateGym from './components/gyms/CreateGym';
+import MyGymTrainer from './components/gyms/MyGymTrainer';
+import UploadPdf from './components/mainTrainer/notes/UploadPdf';
 
 
 const Stack = createStackNavigator();
@@ -312,6 +315,32 @@ const App = () => {
                 header: () => null
               }}
             />
+            <Stack.Screen 
+              name="UploadPdf"
+              component={UploadPdf}
+              options={{
+                header: () => null
+              }}
+            />
+
+              {
+                // gyms
+              }
+            <Stack.Screen 
+              name="CreateGym"
+              component={CreateGym}
+              options={{
+                header: () => null
+              }}
+            />
+            <Stack.Screen 
+              name="MyGymTrainer"
+              component={MyGymTrainer}
+              options={{
+                header: () => null
+              }}
+            />
+
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

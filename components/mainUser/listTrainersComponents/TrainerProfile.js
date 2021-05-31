@@ -348,7 +348,7 @@ const TrainerProfileScreen = ({navigation}) => {
 
                           return(
                             <TouchableOpacity 
-                              onPress={ () => navigation.navigate('WatchVideo',{document, downloadedFile, downloadedFileBoolean})}
+                              onPress={ () => navigation.navigate('WatchVideo',{ document, downloadedFile, downloadedFileBoolean})}
                               style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
                               <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
                               <View>
@@ -374,15 +374,47 @@ const TrainerProfileScreen = ({navigation}) => {
                     {
                       documents.map( (document, indexDocument) => {
 
+
                         if(document.tipo === 'pdf')
                         {
                           const index___ = document.nombreDocumento.search('___');
                           const justName = document.nombreDocumento.slice(0, index___);
+
+                          let downloadedFileBoolean = false;
+                          let downloadedFile = {};
+
+                          //console.log('jjjjjjjjjj',downloadedFiles.files.length);
+
+                          for(let i = 0; i < downloadedFiles.files.length; i++)
+                          {
+                          
+                            if(downloadedFiles.files[i].idDocumentMysql == document.idDocumentos)
+                            {
+                              console.log('if');
+                              downloadedFileBoolean = true;
+                              downloadedFile = downloadedFiles.files[i];
+                              break;
+                            }
+                            
+                          }
+
                           return(
                             <TouchableOpacity 
-                              onPress={ () => navigation.navigate('WatchPdf',{url: document.url, name: document.nombreDocumento})}
+                              onPress={ () => navigation.navigate('WatchPdf',{ document, downloadedFile,downloadedFileBoolean})}
                               style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
                               <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
+                              <View>
+                                {
+                                  downloadedFileBoolean  ?
+                                  (
+                                      <Text style={{backgroundColor: '#fff', padding: 5, color: Colors.MainBlue}}>Descargado</Text>
+                                  )
+                                  :
+                                  (
+                                      <Text style={{backgroundColor: '#fff', padding: 5, color: Colors.MainBlue}}>No Descargado</Text>
+                                  )
+                                }
+                              </View>
                             </TouchableOpacity>
                           )
                         }

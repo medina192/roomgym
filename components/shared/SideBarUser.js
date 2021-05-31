@@ -20,13 +20,18 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import * as Keychain from 'react-native-keychain';
 
+import { useDispatch, useSelector } from 'react-redux';
+
+import { clearState } from '../../store/actions/actionsReducer';
+
 const SideBarUser = ({navigation}) => {
 
+    const dispatch = useDispatch();
+
     const deleteSecureStorage = async() => {
+        dispatch(clearState());
         await Keychain.resetGenericPassword();
-        setTimeout(() => {
-            navigation.navigate('Login');
-        }, 2000);
+        navigation.navigate('Login');
     }
 
     return(

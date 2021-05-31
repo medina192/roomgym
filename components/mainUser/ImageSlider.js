@@ -6,17 +6,20 @@ import {
 } from 'react-native';
 
 
-const ImageSlider = () => {
+const ImageSlider = ({stopImageSlider}) => {
 
     const [carrusel, setCarrusel] = useState(1);
 
     setTimeout(() => {
-      if(carrusel === 5)
+      if(!stopImageSlider)
       {
-        setCarrusel(1);
-      }
-      else{
-        setCarrusel(carrusel + 1);
+        if(carrusel === 5)
+        {
+          setCarrusel(1);
+        }
+        else{
+          setCarrusel(carrusel + 1);
+        }
       }
     }, 2000);
 

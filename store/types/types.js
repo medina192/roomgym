@@ -8,5 +8,7 @@ export const types = {
     currentRoutine: 'currentRoutine',
     idRelation: 'idRelation',
     T_routinesSaved: 'T_routinesSaved',
-    currentExercise: 'currentExercise'
+    currentExercise: 'currentExercise',
+    changeState: 'changeState',
+    clearState: 'clearState',
 }

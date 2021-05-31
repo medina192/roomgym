@@ -8,7 +8,8 @@ import {
   TouchableHighlight,
   TouchableWithoutFeedback,
   Keyboard,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 
 import { Button, Paragraph, Dialog, Portal } from 'react-native-paper';
@@ -33,6 +34,8 @@ import { urlServer } from '../../services/urlServer';
 
 import { saveUser, T_saveTrainer} from '../../store/actions/actionsReducer';
 
+import AlertComponent from '../shared/AlertComponent';
+
 
 const Register = ({navigation}) => {
 
@@ -41,6 +44,7 @@ const Register = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [visibleAlertPassword, setVisibleAlertPassword] = useState(false);
   const [visibleAlertEmail, setVisibleAlertEmail] = useState(false);
+  const [mainIndicator, setMainIndicator] = useState(false);
   const [form, setform] = useState({
     nombres: '',
     apellidos: '',
@@ -51,6 +55,15 @@ const Register = ({navigation}) => {
     descripcion: '',
     cedula: '',
     tipo_de_cuenta: ''
+  });
+  const [showAlert, setShowAlert] = useState({
+    show: false,
+    type: 'error',
+    action: 'close', 
+    message: '', 
+    title: '', 
+    iconAlert: 'times-circle',
+    nextScreen: 'MyGymTrainer'
   });
 
   useEffect(() => {
@@ -71,7 +84,7 @@ const Register = ({navigation}) => {
       });
       console.log('timeOut');
     }
-    getUsers1();
+    //getUsers1();
 
 
     /*
@@ -368,14 +381,24 @@ const Register = ({navigation}) => {
 
 const sendForm = () => {
 
+    setMainIndicator(true);
 
     if(form.nombres && form.apellidos && form.email && form.password && form.confirmPassword
       && form.fecha_de_nacimiento){
       
         if(form.password !== form.confirmPassword)
         {
-          console.log('passwords are not equal');
-          showDialogPassword();
+          setMainIndicator(false);
+          setShowAlert({
+            show: true,
+            type: 'error',
+            action: 'close', 
+            message: 'Las contraseñas no coinciden', 
+            title: 'Contraseñas diferentes', 
+            iconAlert: 'times',
+            nextScreen: 'MyGymTrainer'
+          });
+          //showDialogPassword();
           return;
         }
         else{
@@ -399,6 +422,7 @@ const sendForm = () => {
           })
           .then(function (response) {
               console.log('good, user registered',response);
+              setMainIndicator(false);
               bodyUser.idusuario = response.data.resp.insertId;
               navigation.navigate('ChooseRole',bodyUser);
               //dispatch(saveUser(bodyUser));
@@ -406,6 +430,50 @@ const sendForm = () => {
           })
           .catch(function (error) {
               console.log('res', error);
+
+              setMainIndicator(false);
+              if(error.request._response.slice(0,17) === 'Failed to connect')
+              {
+                console.log('if');
+                setShowAlert({
+                  show: true,
+                  type: 'error',
+                  action: 'close', 
+                  message: 'Verifica tu conexión a internet o notifica al equipo de GymRoom sobre el problema', 
+                  title: 'No se pudo conectar con el servidor', 
+                  iconAlert: 'wifi',
+                  nextScreen: 'MyGymTrainer'
+                });
+              }
+              else{
+
+                if(error.response?.data.sqlMessage.slice(0,15) == 'Duplicate entry')
+                {
+                  setShowAlert({
+                    show: true,
+                    type: 'error',
+                    action: 'close', 
+                    message: 'El Email que introduciste ya esta registrado, intenta con uno nuevo', 
+                    title: 'Correo duplicado', 
+                    iconAlert: 'envelope',
+                    nextScreen: 'MyGymTrainer'
+                  });
+                }
+                //console.log('rese', error);
+                /*
+                console.log('the server is disconnected');
+                setMainIndicator(false);
+                setShowAlert({
+                  show: true,
+                  type: 'error',
+                  action: 'return', 
+                  message: 'Verifica tu conexión a internet', 
+                  title: 'No se pudo conectar con el servidor', 
+                  iconAlert: 'wifi',
+                  nextScreen: 'MyGymTrainer'
+                });
+                */
+              }
               /*
                             if(error.response?.data.sqlMessage)
               {
@@ -423,8 +491,17 @@ const sendForm = () => {
         }
     }
     else{
-      console.log('dialog');
-      showDialog();
+      //showDialog();
+      setMainIndicator(false);
+      setShowAlert({
+        show: true,
+        type: 'error',
+        action: 'close', 
+        message: 'Debes llenar todos los campos', 
+        title: 'Faltan campos por llenar', 
+        iconAlert: 'envelope',
+        nextScreen: 'MyGymTrainer'
+      });
     }
 }
 
@@ -442,221 +519,267 @@ const sendForm = () => {
   
   return (
     <>  
-      <TouchableWithoutFeedback onPress={hideKeyBoard}>
-        <ScrollView>
-          <View style={styles.containerInputs} >
-            <Icon style={styles.mainIcon} name="user-circle" size={50} color="#fff" />
-            <View style={  styles.containerIconInput }>
-              <Icon name="user-o" size={24} style={styles.iconInputClass} color="#fff" />
-              <TextInput style={styles.inputRegister}
-                placeholder="Nombre"
-                placeholderTextColor={Colors.MainBlue}
-                onChangeText={ (text) => saveInputsValues('nombres',text) }
-              />
-            </View>
-            <View style={  styles.containerIconInput }>
-              <Icon name="drivers-license-o" style={styles.iconInputClass} size={24} color="#fff" />
-              <TextInput style={styles.inputRegister}
-                placeholder="Apellidos"
-                placeholderTextColor={Colors.MainBlue}
-                onChangeText={ (text) => saveInputsValues('apellidos',text) }
-              />
-            </View>
-            <View style={  styles.containerIconInput }>
-              <Icon name="envelope" style={styles.iconInputClass} size={24} color="#fff" />
-              <TextInput style={styles.inputRegister}
-                placeholder="Email"
-                placeholderTextColor={Colors.MainBlue}
-                onChangeText={ (text) => saveInputsValues('email',text) }
-              />
-            </View>
-            <View style={  styles.containerIconInput }>
-              <Icon name="lock" style={styles.iconInputClass} size={24} color="#fff" />
-              <TextInput style={styles.inputRegister}
-                placeholder="Contraseña"
-                secureTextEntry={true}
-                placeholderTextColor={Colors.MainBlue}
-                onChangeText={ (text) => saveInputsValues('password',text) }
-              />
-            </View>
-            <View style={  styles.containerIconInput }>
-              <Icon name="lock" style={styles.iconInputClass} size={24} color="#fff" />
-              <TextInput style={styles.inputRegister}
-                placeholder="Confirmar contraseña"
-                placeholderTextColor={Colors.MainBlue}
-                secureTextEntry={true}
-                onChangeText={ (text) => saveInputsValues('confirmPassword',text) }
-              />
-            </View>
 
-            <TouchableHighlight style={styles.buttonPicker} onPress={showDatePicker}>
-              <View style={styles.buttonPickerView}>
-                <Icon name="calendar" style={styles.buttonPickerIcon} size={24} color="#fff" />
-                <Text style={styles.textButtonPicker}>Fechas de nacimiento</Text>
-              </View>
-            </TouchableHighlight>
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleConfirm}
-              onCancel={hideDatePicker}
-            />
-            
-            {
-              /*
-                          <Text style={styles.typeAccounText}>Selecciona tu tipo de cuenta</Text>
-            
-                          <View style={styles.containerCheckBox1}>
-                            <CheckBox
-                            disabled={false}
-                            value={!checkboxValue}
-                            onValueChange={() => setCheckBoxValue(!checkboxValue)}
-                            />
-                            <Text style={styles.textCheckbox}>Usuario</Text>
-                          </View>
-                          <View style={styles.containerCheckBox2}>
-                            <CheckBox
-                            disabled={false}
-                            value={checkboxValue}
-                            onValueChange={() => setCheckBoxValue(!checkboxValue)}
-                            />
-                            <Text style={styles.textCheckbox}>Entrenador</Text>
-                          </View>
-            }
-
-
-            {
-              /*
-              checkboxValue ? 
-              (
-                <TouchableWithoutFeedback onPress={hideKeyBoard}>
+              <TouchableWithoutFeedback onPress={hideKeyBoard}>
+              <ScrollView>
                 <View style={styles.containerInputs} >
-                  <Text style={styles.textTrayectory}>* Agrega una descripción sobre ti y tu trayectoria</Text>
+                  <Icon style={styles.mainIcon} name="user-circle" size={50} color="#fff" />
                   <View style={  styles.containerIconInput }>
-                    <Icon name="folder-o" style={styles.iconInputClass} size={24} color="#fff" />
+                    <Icon name="user-o" size={24} style={styles.iconInputClass} color="#fff" />
                     <TextInput style={styles.inputRegister}
-                      placeholder="Descripcion"
-                      multiline={true}
-                      onChangeText={ (text) => saveInputsValues('descripcion',text) }
+                      placeholder="Nombre"
+                      placeholderTextColor={Colors.MainBlue}
+                      onChangeText={ (text) => saveInputsValues('nombres',text) }
                     />
                   </View>
                   <View style={  styles.containerIconInput }>
-                    <Icon name="id-card" style={styles.iconInputClass} size={24} color="#fff" />
+                    <Icon name="drivers-license-o" style={styles.iconInputClass} size={24} color="#fff" />
                     <TextInput style={styles.inputRegister}
-                      placeholder="Cedula"
-                      onChangeText={ (text) => saveInputsValues('cedula',text) }
+                      placeholder="Apellidos"
+                      placeholderTextColor={Colors.MainBlue}
+                      onChangeText={ (text) => saveInputsValues('apellidos',text) }
                     />
                   </View>
-                </View>
-              </TouchableWithoutFeedback>
-              )  : null
-              */
-            }
-            
-            {
-              // error empty fields alert
-            }
-            <View>
-              <Portal>
-                <Dialog visible={visible} onDismiss={hideDialog}>
-                  <Dialog.Title>Error</Dialog.Title>
-                  <Dialog.Content>
-                    <Paragraph>Faltan campos por llenar</Paragraph>
-                  </Dialog.Content>
-                  <Dialog.Actions>
-                    <Button onPress={hideDialog}>Cerrar</Button>
-                  </Dialog.Actions>
-                </Dialog>
-              </Portal>
-            </View>
-
-            <View>
-              <Portal>
-                <Dialog visible={visibleAlertEmail} onDismiss={hideDialogEmail}>
-                  <Dialog.Title>Error</Dialog.Title>
-                  <Dialog.Content>
-                    <Paragraph>El email ya existe</Paragraph>
-                  </Dialog.Content>
-                  <Dialog.Actions>
-                    <Button onPress={hideDialogEmail}>Cerrar</Button>
-                  </Dialog.Actions>
-                </Dialog>
-              </Portal>
-            </View>
-
-            {
-              // error passwords are not equal alert
-            }
-            <View>
-              <Portal>
-                <Dialog visible={visibleAlertPassword} onDismiss={hideDialogPassowrd}>
-                  <Dialog.Title>Error</Dialog.Title>
-                  <Dialog.Content>
-                    <Paragraph>Las contraseñas no coinciden</Paragraph>
-                  </Dialog.Content>
-                  <Dialog.Actions>
-                    <Button onPress={hideDialogPassowrd}>Cerrar</Button>
-                  </Dialog.Actions>
-                </Dialog>
-              </Portal>
-            </View>
-
-            <TouchableHighlight style={styles.buttonLogin}  onPress={sendForm}>
-              <Text style={styles.buttonLoginText}>Registrarse</Text>
-            </TouchableHighlight>
-
-            {
-              /*
-                           <View>
-              <LoginButton
-                onLoginFinished={
-                  (error, result) => {
-                    if (error) {
-                      console.log("login has error: " + result.error);
-                    } else if (result.isCancelled) {
-                      console.log("login is cancelled.");
-                    } else {
-                      AccessToken.getCurrentAccessToken().then(
-                        (data) => {
-                          console.log(data.accessToken.toString())
-                        }
-                      )
-                    }
+                  <View style={  styles.containerIconInput }>
+                    <Icon name="envelope" style={styles.iconInputClass} size={24} color="#fff" />
+                    <TextInput style={styles.inputRegister}
+                      placeholder="Email"
+                      placeholderTextColor={Colors.MainBlue}
+                      onChangeText={ (text) => saveInputsValues('email',text) }
+                    />
+                  </View>
+                  <View style={  styles.containerIconInput }>
+                    <Icon name="lock" style={styles.iconInputClass} size={24} color="#fff" />
+                    <TextInput style={styles.inputRegister}
+                      placeholder="Contraseña"
+                      secureTextEntry={true}
+                      placeholderTextColor={Colors.MainBlue}
+                      onChangeText={ (text) => saveInputsValues('password',text) }
+                    />
+                  </View>
+                  <View style={  styles.containerIconInput }>
+                    <Icon name="lock" style={styles.iconInputClass} size={24} color="#fff" />
+                    <TextInput style={styles.inputRegister}
+                      placeholder="Confirmar contraseña"
+                      placeholderTextColor={Colors.MainBlue}
+                      secureTextEntry={true}
+                      onChangeText={ (text) => saveInputsValues('confirmPassword',text) }
+                    />
+                  </View>
+      
+                  <TouchableHighlight style={styles.buttonPicker} onPress={showDatePicker}>
+                    <View style={styles.buttonPickerView}>
+                      <Icon name="calendar" style={styles.buttonPickerIcon} size={24} color="#fff" />
+                      <Text style={styles.textButtonPicker}>Fechas de nacimiento</Text>
+                    </View>
+                  </TouchableHighlight>
+                  <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    onConfirm={handleConfirm}
+                    onCancel={hideDatePicker}
+                  />
+                  
+                  {
+                    /*
+                                <Text style={styles.typeAccounText}>Selecciona tu tipo de cuenta</Text>
+                  
+                                <View style={styles.containerCheckBox1}>
+                                  <CheckBox
+                                  disabled={false}
+                                  value={!checkboxValue}
+                                  onValueChange={() => setCheckBoxValue(!checkboxValue)}
+                                  />
+                                  <Text style={styles.textCheckbox}>Usuario</Text>
+                                </View>
+                                <View style={styles.containerCheckBox2}>
+                                  <CheckBox
+                                  disabled={false}
+                                  value={checkboxValue}
+                                  onValueChange={() => setCheckBoxValue(!checkboxValue)}
+                                  />
+                                  <Text style={styles.textCheckbox}>Entrenador</Text>
+                                </View>
                   }
-                }
-                onLogoutFinished={() => console.log("logout.")}/>
-            </View>
-               */
-            }
+      
+      
+                  {
+                    /*
+                    checkboxValue ? 
+                    (
+                      <TouchableWithoutFeedback onPress={hideKeyBoard}>
+                      <View style={styles.containerInputs} >
+                        <Text style={styles.textTrayectory}>* Agrega una descripción sobre ti y tu trayectoria</Text>
+                        <View style={  styles.containerIconInput }>
+                          <Icon name="folder-o" style={styles.iconInputClass} size={24} color="#fff" />
+                          <TextInput style={styles.inputRegister}
+                            placeholder="Descripcion"
+                            multiline={true}
+                            onChangeText={ (text) => saveInputsValues('descripcion',text) }
+                          />
+                        </View>
+                        <View style={  styles.containerIconInput }>
+                          <Icon name="id-card" style={styles.iconInputClass} size={24} color="#fff" />
+                          <TextInput style={styles.inputRegister}
+                            placeholder="Cedula"
+                            onChangeText={ (text) => saveInputsValues('cedula',text) }
+                          />
+                        </View>
+                      </View>
+                    </TouchableWithoutFeedback>
+                    )  : null
+                    */
+                  }
+                  
+                  {
+                    // error empty fields alert
+                  }
+                  <View>
+                    <Portal>
+                      <Dialog visible={visible} onDismiss={hideDialog}>
+                        <Dialog.Title>Error</Dialog.Title>
+                        <Dialog.Content>
+                          <Paragraph>Faltan campos por llenar</Paragraph>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                          <Button onPress={hideDialog}>Cerrar</Button>
+                        </Dialog.Actions>
+                      </Dialog>
+                    </Portal>
+                  </View>
+      
+                  <View>
+                    <Portal>
+                      <Dialog visible={visibleAlertEmail} onDismiss={hideDialogEmail}>
+                        <Dialog.Title>Error</Dialog.Title>
+                        <Dialog.Content>
+                          <Paragraph>El email ya existe</Paragraph>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                          <Button onPress={hideDialogEmail}>Cerrar</Button>
+                        </Dialog.Actions>
+                      </Dialog>
+                    </Portal>
+                  </View>
+      
+                  {
+                    // error passwords are not equal alert
+                  }
+                  <View>
+                    <Portal>
+                      <Dialog visible={visibleAlertPassword} onDismiss={hideDialogPassowrd}>
+                        <Dialog.Title>Error</Dialog.Title>
+                        <Dialog.Content>
+                          <Paragraph>Las contraseñas no coinciden</Paragraph>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                          <Button onPress={hideDialogPassowrd}>Cerrar</Button>
+                        </Dialog.Actions>
+                      </Dialog>
+                    </Portal>
+                  </View>
+      
+                  <TouchableHighlight style={styles.buttonLogin}  onPress={sendForm}>
+                    <Text style={styles.buttonLoginText}>Registrarse</Text>
+                  </TouchableHighlight>
+      
+                  {
+                    /*
+                                <View>
+                    <LoginButton
+                      onLoginFinished={
+                        (error, result) => {
+                          if (error) {
+                            console.log("login has error: " + result.error);
+                          } else if (result.isCancelled) {
+                            console.log("login is cancelled.");
+                          } else {
+                            AccessToken.getCurrentAccessToken().then(
+                              (data) => {
+                                console.log(data.accessToken.toString())
+                              }
+                            )
+                          }
+                        }
+                      }
+                      onLogoutFinished={() => console.log("logout.")}/>
+                  </View>
+                    */
+                  }
+      
+                  {
+                      /*
+                                  <GoogleSigninButton
+                    style={{ width: 200, height: 60 }}
+                    size={GoogleSigninButton.Size.Wide}
+                    color={GoogleSigninButton.Color.Dark}
+                    onPress={signIn} 
+                    />
+                      */
+                  }
+      
+      
+                  <Text style={styles.textAccount}>¿Ya tienes una cuenta?</Text>
+                  <Text style={styles.textLogin} onPress={navigateLogin}>Inicia sesión aquí</Text>
 
-            {
-                /*
-                            <GoogleSigninButton
-              style={{ width: 200, height: 60 }}
-              size={GoogleSigninButton.Size.Wide}
-              color={GoogleSigninButton.Color.Dark}
-              onPress={signIn} 
-              />
-                */
-            }
-
-
-            <Text style={styles.textAccount}>¿Ya tienes una cuenta?</Text>
-            <Text style={styles.textLogin} onPress={navigateLogin}>Inicia sesión aquí</Text>
-          </View>
-          <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('MainUserScreen')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Usuario</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('MainTrainerScreen')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Entrenador</Text>
-          </TouchableOpacity>
-        </View>
-        </ScrollView>
-      </TouchableWithoutFeedback>
+                  {
+                    mainIndicator ? 
+                    (
+                      <View style={styles.grayContainer}>
+                        <View style={styles.containerIndicator}>
+                          <ActivityIndicator
+                            size={80}
+                            color={Colors.MainBlue}
+                            style={styles.activityIndicator}
+                          />
+                        </View>
+                      </View>
+                    )
+                    :
+                    (
+                      <>
+                      </>
+                    )
+                  }
+                  {
+                    showAlert.show ? 
+                    (
+                      <AlertComponent 
+                        navigation={navigation} 
+                        type={showAlert.type}  
+                        action={showAlert.action} 
+                        message={showAlert.message} 
+                        title={showAlert.title} 
+                        iconAlert={showAlert.iconAlert}
+                        closeFunction={setShowAlert}
+                        stateVariable={showAlert}
+                        nextScreen={showAlert.nextScreen}
+                      />
+                    )
+                    :
+                    (
+                      <>
+                      </>
+                    )
+                  }
+                </View>
+                  {
+                      /*
+                          <View style={styles.containerButtonSubscribe}>
+                            <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('MainUserScreen')}>
+                              <Text style={styles.textButoonSubscribe}>Pantalla Usuario</Text>
+                            </TouchableOpacity>
+                          </View>
+                  
+                          <View style={styles.containerButtonSubscribe}>
+                            <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('MainTrainerScreen')}>
+                              <Text style={styles.textButoonSubscribe}>Pantalla Entrenador</Text>
+                            </TouchableOpacity>
+                          </View>
+                      */
+                  }
+              </ScrollView>
+            </TouchableWithoutFeedback>
     </>
   );
 };
@@ -664,13 +787,37 @@ const sendForm = () => {
 
 
 const styles = StyleSheet.create({
+
+  grayContainer:{
+    position: 'absolute',
+    width: '100%',
+    flex:1,
+    backgroundColor: '#00000099'
+  },
+    containerIndicator:{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'absolute',
+      backgroundColor: '#fff',
+      width: '70%',
+      height: '50%',
+      top: '25%',
+      left: '15%',
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
+    },
+
     containerInputs:{
         flex: 1,
         width: '100%',
         backgroundColor: '#fff',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        position: 'relative'
     },
     inputRegister:{
       flex: 1,

@@ -65,7 +65,7 @@ const WatchVideo = ({navigation, route}) => {
     const urlInServer = `http://192.168.0.9:3002/videos/${route.params.document.nombreDocumento}`;
 
     const downloadPdf = () => {
-        console.log('hi');
+
         // Main function to download the image
         // https://aboutreact.com/download-image-in-react-native/    image
         // To add the time suffix in filename

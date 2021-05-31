@@ -8,7 +8,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
-  Switch
+  Switch,
+  ActivityIndicator,
 } from 'react-native';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,11 +31,44 @@ import { saveUser, T_saveTrainer } from '../../store/actions/actionsReducer';
 
 import { urlServer } from '../../services/urlServer';
 
+import AlertComponent from '../shared/AlertComponent';
 
 const Login = ({navigation}) => {
 
   const dispatch = useDispatch();
 
+  const state = useSelector(state => state.changeState);
+  const user = useSelector(state => state.user);
+  const T_trainer = useSelector(state => state.T_trainer);
+
+  const [mainIndicator, setMainIndicator] = useState(false);
+  const [showAlert, setShowAlert] = useState({
+    show: false,
+    type: 'error',
+    action: 'close', 
+    message: '', 
+    title: '', 
+    iconAlert: 'times-circle',
+    nextScreen: 'MyGymTrainer'
+  });
+
+  const wer = useSelector(state => state);
+  console.log('------------ user screen', wer);
+
+  useEffect(() => {
+
+    if(!user == '')
+    {
+      navigation.navigate('MainUserScreen');
+    }
+    else if(!T_trainer == '')
+    {
+      navigation.navigate('MainTrainerScreen');
+    }
+    else{
+      setMainIndicator(false);
+    }
+  }, [state]);
 
   const verifyIfUserIsLogged = async() => {
     /*
@@ -44,12 +78,16 @@ const Login = ({navigation}) => {
     // Store the credentials
     const p = await Keychain.setGenericPassword(username, password);
     */
+
+
+
+
     try {
       // Retrieve the credentials
       const credentials = await Keychain.getGenericPassword();
       if (credentials) {
         const userObject = JSON.parse(credentials.username);
-        console.log('password', credentials.password);
+        //console.log('password', credentials.password);
         if(credentials.password == '1')
         {
           dispatch(saveUser(userObject));
@@ -147,6 +185,8 @@ const Login = ({navigation}) => {
   const sendForm = () => {  // send the form to the backend
 
 
+    setMainIndicator(true);
+
     if(form.email && form.password)
     {
       const bodyUser = {
@@ -202,20 +242,18 @@ const Login = ({navigation}) => {
             method: 'get',
             url: `${serverUrl}/auth/getRol/${auxIdusuario}`
           }).then((resp) => {
-            console.log(resp.data.resp[0].idrol);
+            //console.log(resp.data.resp[0].idrol);
 
             if(isEnabled)
             {
               if(resp.data.resp[0].idrol == 1)
               {
-                console.log('user');
   
                 dispatch(saveUser(userObject));
                 generateSecureStorage(userString, '1');
                 //navigation.navigate('MainUserScreen');
               }
               else{
-                console.log('trainer');
   
                 dispatch(T_saveTrainer(userObject));
                 generateSecureStorage(userString, '2');
@@ -225,12 +263,12 @@ const Login = ({navigation}) => {
             else{
               if(resp.data.resp[0].idrol == 1)
               {
-  
+                setMainIndicator(false);
                 dispatch(saveUser(userObject));
                 navigation.navigate('MainUserScreen');
               }
               else{
-  
+                setMainIndicator(false);
                 dispatch(T_saveTrainer(userObject));
                 navigation.navigate('MainTrainerScreen');
               }
@@ -241,12 +279,53 @@ const Login = ({navigation}) => {
           });
       })
       .catch(function (error) {
-          console.log('error axios',error);
-          showDialog();
+          //console.log('error axios',error);
+          //showDialog();
+          setMainIndicator(false);
+          if(error.request._response.slice(0,17) === 'Failed to connect')
+          {
+
+            setShowAlert({
+              show: true,
+              type: 'error',
+              action: 'close', 
+              message: 'Verifica tu conexión a internet o notifica al equipo de GymRoom sobre el problema', 
+              title: 'No se pudo conectar con el servidor', 
+              iconAlert: 'wifi',
+              nextScreen: 'MyGymTrainer'
+            });
+          }
+          else{
+
+            const responseObject = JSON.parse(error.request._response);
+            
+            if(responseObject.message == 'the email does not exists')
+            {
+              setShowAlert({
+                show: true,
+                type: 'error',
+                action: 'close', 
+                message: 'El email o la contraseña son incorrectos', 
+                title: 'Acceso denegado', 
+                iconAlert: 'times',
+                nextScreen: 'MyGymTrainer'
+              });
+            }
+          }
       });
     }
     else{
-      console.log('empty fields');
+
+      setMainIndicator(false);
+      setShowAlert({
+        show: true,
+        type: 'error',
+        action: 'close', 
+        message: 'Es necesario que llenes todos los campos', 
+        title: 'Campos faltantes', 
+        iconAlert: 'edit',
+        nextScreen: 'MyGymTrainer'
+      });
     }
   }
 
@@ -396,7 +475,9 @@ const Login = ({navigation}) => {
         </TouchableOpacity>
         </View>
 
-        <View style={styles.containerButtonSubscribe}>
+        {
+          /*
+                  <View style={styles.containerButtonSubscribe}>
           <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('MainUserScreen')}>
             <Text style={styles.textButoonSubscribe}>Pantalla Usuario</Text>
           </TouchableOpacity>
@@ -407,6 +488,48 @@ const Login = ({navigation}) => {
             <Text style={styles.textButoonSubscribe}>Pantalla Entrenador</Text>
           </TouchableOpacity>
         </View>
+          */
+        }
+        {
+                    mainIndicator ? 
+                    (
+                      <View style={styles.grayContainer}>
+                        <View style={styles.containerIndicator}>
+                          <ActivityIndicator
+                            size={80}
+                            color={Colors.MainBlue}
+                            style={styles.activityIndicator}
+                          />
+                        </View>
+                      </View>
+                    )
+                    :
+                    (
+                      <>
+                      </>
+                    )
+                  }
+                  {
+                    showAlert.show ? 
+                    (
+                      <AlertComponent 
+                        navigation={navigation} 
+                        type={showAlert.type}  
+                        action={showAlert.action} 
+                        message={showAlert.message} 
+                        title={showAlert.title} 
+                        iconAlert={showAlert.iconAlert}
+                        closeFunction={setShowAlert}
+                        stateVariable={showAlert}
+                        nextScreen={showAlert.nextScreen}
+                      />
+                    )
+                    :
+                    (
+                      <>
+                      </>
+                    )
+                  }
       </View>
     </TouchableWithoutFeedback>
     </>
@@ -414,13 +537,39 @@ const Login = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
+
+  grayContainer:{
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#00000099'
+  },
+    containerIndicator:{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'absolute',
+      backgroundColor: '#fff',
+      width: '70%',
+      height: '50%',
+      top: '25%',
+      left: '15%',
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
+    },
+
+
+
   containerInputs:{
     flex: 1,
     width: '100%',
     backgroundColor: '#fff',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    position: 'relative'
 },
  scrollContainer:{
   width: '100%',

@@ -10,7 +10,8 @@ const initialState = {
     idRelation: 0,
     routineT: [],
     currentRoutine: {},
-    currentExercise: {}
+    currentExercise: {},
+    changeState: false,
 }
 
 export const mainReducer = (state = initialState, action) => {
@@ -62,10 +63,29 @@ export const mainReducer = (state = initialState, action) => {
                 idRelation: action.payload.idRelation
             }    
         case types.T_routinesSaved:
-        return{
+            return{
+                    ...state,
+                    routineT: action.payload.routine
+                }    
+        case types.changeState:
+            return{
                 ...state,
-                routineT: action.payload.routine
-            }    
+                changeState: action.payload.state
+            }
+        case types.clearState:
+            return{
+                user: '',
+                trainer: '',
+                T_trainer: '',
+                T_user: '',
+                subRoutine: {},
+                subCategorie: {},
+                idRelation: 0,
+                routineT: [],
+                currentRoutine: {},
+                currentExercise: {},
+                changeState: false,
+            }   
         break;
     
         default:

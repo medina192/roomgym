@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,6 +9,7 @@ import {
   Button,
   Switch,
   Image,
+  Dimensions
 } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -32,6 +33,14 @@ import { urlServer } from '../../../services/urlServer';
 
 import Video, {FilterType} from 'react-native-video';
 
+import Pdf from 'react-native-pdf';
+
+import { changeState } from '../../store/actions/actionsReducer';
+
+import RNFetchBlob from 'rn-fetch-blob';
+
+import DocumentPicker from 'react-native-document-picker';
+
 const Drawer = createDrawerNavigator();
 
 export default function MainTrainerScreen({navigation}) {
@@ -50,10 +59,23 @@ const TrainerScreen = ({navigation}) => {
   const dispatch = useDispatch();
 
   const T_trainer = useSelector(state => state.T_trainer);
+  const state = useSelector(state => state.changeState);
+  
+
+  useEffect(() => {
+    
+    return () => {
+      dispatch(changeState(!state));
+    }
+
+  }, []);
 
 
+      
+  console.log('----------------- main trainer screen');
   const [showButtonPhoto, setShowButtonPhoto] = useState(true);
   const [showButtonVideo, setShowButtonVideo] = useState(true);
+  const [showButtonPdf, setShowButtonPdf] = useState(true);
 
   const [imageNameInputValue, setImageNameInputValue] = useState('');
   const [imagePublic, setImagePublic] = useState(false);
@@ -67,6 +89,14 @@ const TrainerScreen = ({navigation}) => {
   const [videoPublic, setVideoPublic] = useState(false);
   const [videoShowInPerfil, setVideoShowInPerfil] = useState(false);
   const [videoAdded, setVideoAdded] = useState({
+    boolean: false,
+    data: {}
+  });
+
+  const [pdfNameInputValue, setPdfNameInputValue] = useState('');
+  const [pdfPublic, setPdfPublic] = useState(false);
+  const [pdfShowInPerfil, setPdfShowInPerfil] = useState(false);
+  const [pdfAdded, setPdfAdded] = useState({
     boolean: false,
     data: {}
   });
@@ -297,9 +327,185 @@ const TrainerScreen = ({navigation}) => {
     uploadVideo(videoAdded.object);
   }
 
-
-
   // end photograph    end ________________________________________________________________________
+
+
+  const pickDocument = async () => {
+    setShowButtonPdf(false);
+    // Pick a single file
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.pdf ],
+      });
+      console.log(
+        res.uri,
+        res.type, // mime type
+        res.name,
+        res.size
+      );
+      setPdfAdded({
+        boolean: true,
+        data: res
+      });
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker, exit any dialogs or menus and move on
+      } else {
+        throw err;
+      }
+    }
+
+    /*
+    // Pick multiple files
+    try {
+      const results = await DocumentPicker.pickMultiple({
+        type: [DocumentPicker.types.pdf],
+      });
+      for (const res of results) {
+        console.log(
+          res.uri,
+          res.type, // mime type
+          res.name,
+          res.size
+        );
+      }
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker, exit any dialogs or menus and move on
+      } else {
+        throw err;
+      }
+    }
+    */
+  }
+
+
+  const readPdf = () => {
+    let data = ''
+    RNFetchBlob.fs.readStream(
+        // file path
+        'content://com.android.providers.downloads.documents/document/1253',
+        // encoding, should be one of `base64`, `utf8`, `ascii`
+        'base64',
+        // (optional) buffer size, default to 4096 (4095 for BASE64 encoded data)
+        // when reading file in BASE64 encoding, buffer size must be multiples of 3.
+        4095)
+    .then((ifstream) => {
+        console.log('ifstream', ifstream);
+        //const formData = new FormData();
+        //formData.append('file', ifstream);
+        data = ifstream;
+
+        ifstream.open()
+        ifstream.onData((chunk) => {
+          // when encoding is `ascii`, chunk will be an array contains numbers
+          // otherwise it will be a string
+          data += chunk
+        })
+        ifstream.onError((err) => {
+          console.log('oops', err)
+        })
+        ifstream.onEnd(() => {
+          //<Image source={{ uri : 'data:image/png,base64' + data }}
+          console.log('end');
+        });
+    });
+
+    
+    setTimeout(() => {
+      //console.log('data', data);
+      aucFun(data);
+    }, 3000);
+
+    const aucFun = async(data1) => {
+
+      const fileToUpload = {
+        uri: 'content://com.android.providers.downloads.documents/document/1253',
+        type: 'application/pdf',
+        name: 'ooooooooo'
+      }
+
+        const formData = new FormData();
+        formData.append('file', fileToUpload);
+        console.log('form', formData);
+        
+      try {
+        const resp = await axios({
+          method: 'post',
+          url: 'http://192.168.0.9:3002/files/savefile',
+          data: formData
+        });
+        console.log('resp', resp);
+      } catch (error) {
+        console.log('error try', error); 
+      }
+    }
+  }
+
+
+
+  const savePdf = () => {
+    uploadPdf(pdfAdded.object);
+  }
+
+  
+  const uploadPdf = async (data) => {
+    
+    /*
+    const fileToUpload = {
+      uri: data.uri,
+      type: 'video/mp4',
+      name: data.fileName
+    }
+
+    let publicVideo = videoPublic ? true : false;
+    let ShowInPerfil = videoShowInPerfil ? true : false;
+
+    const bodyFile = {
+      idTrainer: T_trainer.idusuario,
+      trainerName: T_trainer.nombres,
+      trainerLastName: T_trainer.apellidos,
+      publicVideo,
+      ShowInPerfil,
+      nameVideo: videoNameInputValue
+    }
+
+    const bodyString = JSON.stringify(bodyFile);
+
+    const headers = {
+      'body': bodyString
+    }
+
+    const config = {
+      headers
+    }
+
+    try {
+
+      const formData = new FormData();
+      formData.append('file', fileToUpload);
+
+
+      const resp = await axios({
+        method: 'post',
+        url: 'http://192.168.0.9:3002/files/savevideo',
+        data: formData,
+        headers
+      });
+      setShowButtonVideo(true);
+      setVideoNameInputValue('');
+      setVideoPublic(false);
+      setVideoShowInPerfil(false);      
+      setVideoAdded({
+        boolean: false,
+        data: {}
+      });
+     console.log('respones', resp);
+    } catch (error) {
+      console.log('error submiting image', error);
+    }
+    */
+  }
 
 
   return (
@@ -502,7 +708,7 @@ const TrainerScreen = ({navigation}) => {
               }
               </View>
 
-              <Text>¿Deseas que el video sea publica?</Text>
+              <Text>¿Deseas que el video sea publico?</Text>
               <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}
                   thumbColor={imagePublic ? Colors.MainBlue : "#f4f3f4"}
@@ -538,13 +744,32 @@ const TrainerScreen = ({navigation}) => {
         }
 
 
-
-
         <TouchableOpacity 
           onPress={ () => navigation.navigate('CreatePdf')}
           style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
           <Text>Crear archivo pdf</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={ () => navigation.navigate('CreateGym')}
+          style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
+          <Text>Registrar Gimnasio</Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity 
+          onPress={ () => navigation.navigate('MyGymTrainer')}
+          style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
+          <Text>Ver mi gimnasio</Text>
+        </TouchableOpacity>   
+
+        <TouchableOpacity s
+          onPress={ () => navigation.navigate('UploadPdf') }
+          style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
+          <Text>Subir Pdf</Text>
+        </TouchableOpacity>   
+
+
 
    
         <View style={styles.containerButtonSubscribe}>

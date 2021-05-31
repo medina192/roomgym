@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   Dimensions,
+  Alert,
 } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -28,9 +29,13 @@ import RNFetchBlob from 'rn-fetch-blob';
 
 import axios from 'axios';
 
-
+import messaging from '@react-native-firebase/messaging';
 
 import { openDatabase } from 'react-native-sqlite-storage';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import { changeState } from '../../store/actions/actionsReducer';
 
 const db = openDatabase({ name: 'roomGym.db' });
 
@@ -47,14 +52,39 @@ export default function MainUserScreen({navigation}) {
 }
 
 
-
-
-
-
-
-
 const UserScreen = ({navigation}) => {
 
+  const state = useSelector(state => state.changeState);
+
+  const dispatch = useDispatch();
+
+
+
+  const [stopImageSlider, setStopImageSlider] = useState(false);
+
+  useEffect(() => {
+    /*
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+          Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      });
+
+      messaging()
+      .subscribeToTopic('juanortiz')
+      .then(() => console.log(' subscribe to juan ortiz'));
+
+      const background = messaging().setBackgroundMessageHandler(async remoteMessage => {
+        console.log('notification background', JSON.stringify(remoteMessage))
+      });
+*/
+      return () => {
+  //      unsubscribe();
+        //topicSubscriber();
+    //    background();
+        console.log('return user');
+        setStopImageSlider(true);
+        dispatch(changeState(!state));
+      }
+  }, []);
 
   const changeUserScreen = (newScreen) => {
     navigation.navigate(newScreen);
@@ -190,8 +220,7 @@ const UserScreen = ({navigation}) => {
           "SELECT name FROM sqlite_master WHERE type='table' AND name='UserFiles'",
           [],
           function (tx, res) {
-            console.log('item:', res.rows.length);
-            console.log('tx', tx);
+
             
             if (res.rows.length == 0) {
               txn.executeSql('DROP TABLE IF EXISTS UserFiles', []);
@@ -257,8 +286,13 @@ const UserScreen = ({navigation}) => {
     <>
         <TopBar navigation={navigation} title={`Bienvenido Usuario`} returnButton={false} />
         <ScrollView style={styles.containerScrollView}>
-          <ImageSlider />          
-
+          {
+            /*
+                      <ImageSlider />    
+            */
+          }
+      
+          <ImageSlider stopImageSlider={stopImageSlider}/>    
           <View style={styles.containerTextDescriptionButton}>
             <Text style={styles.textDescriptionButton}>Conitnua con tu rutina del día de hoy</Text>
             <Text style={styles.textDescriptionButtonSubtitle}>La disciplina es lo más importante</Text>

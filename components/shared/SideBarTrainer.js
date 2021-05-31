@@ -20,7 +20,7 @@ import Colors from '../../colors/colors';
 
 import * as Keychain from 'react-native-keychain';
 
-const SideBarUser = ({navigation}) => {
+const SideBarTrainer = ({navigation}) => {
 
 
     const deleteSecureStorage = async() => {
@@ -46,7 +46,7 @@ const SideBarUser = ({navigation}) => {
                     <Icon name="group" size={24} style={styles.iconLink} color="#fff" />
                     <Text style={styles.textLink}>Usuarios</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('Statistics')}>
+                <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('MainTrainerScreen')}>
                     <Icon name="user-o" size={24} style={styles.iconLink} color="#fff" />
                     <Text style={styles.textLink}>Mi perfil</Text>
                 </TouchableOpacity>
@@ -124,4 +124,4 @@ const styles = StyleSheet.create({
     },
 });   
 
-export default SideBarUser;
+export default SideBarTrainer;

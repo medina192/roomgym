@@ -69,7 +69,8 @@ export default function UserDocuments() {
 
 const UserDocumentsScreen = ({navigation}) => {
 
-
+  const [userDocuments, setUserDocuments] = useState([]);
+  const [state, setState] = useState(false);
 
   useEffect(() => {
     const createTable = () => {
@@ -96,6 +97,7 @@ const UserDocumentsScreen = ({navigation}) => {
       console.log('SQLite Database and Table Successfully Created...');
     };
 
+    getData();
     //createTable();
   }, [])
 
@@ -104,7 +106,7 @@ const UserDocumentsScreen = ({navigation}) => {
   const getData = () => {
     db.transaction((tx) => {
       tx.executeSql(
-        'SELECT * FROM documentsUser',
+        'SELECT * FROM UserFiles',
         [],
         (tx, results) => {
           var temp = [];
@@ -113,6 +115,9 @@ const UserDocumentsScreen = ({navigation}) => {
             temp.push(results.rows.item(i));
             console.log('results---', results.rows.item(i));
           }
+          console.log(temp);
+          setUserDocuments(temp);
+          setState(!state);
         }
       );
  
@@ -141,7 +146,56 @@ const UserDocumentsScreen = ({navigation}) => {
     <SafeAreaView style={{flex: 1, backgroundColor: 'fff'}}>
         <TopBar navigation={navigation} title={`Bienvenido Usuario`} returnButton={true} />
           <ScrollView style={{flex: 1}}>
+              {
+                userDocuments.length > 0 ? 
+                (
+                  <View style={styles.containerCards}>
+                    <Text>Videos</Text>
+                    {
+                      userDocuments.map((document, indexVideo) => {
 
+                        const index___ = document.nameDocument.search('___');
+                        const justName = document.nameDocument.slice(0, index___);
+
+                        if(document.type =='video')
+                        {
+                          return(
+                            <TouchableOpacity 
+                              onPress={ () => navigation.navigate('WatchVideo',{document: {}, downloadedFile: document, downloadedFileBoolean: true})}
+                              key={indexVideo} style={styles.cardDocument} >
+                              <Text style={styles.textNameCard}>{justName}</Text>
+                            </TouchableOpacity>
+                          )
+                        }
+                      })
+                    }
+
+                    <Text>Pdfs</Text>
+                    {
+                      userDocuments.map((document, indexPdf) => {
+
+                        const index___ = document.nameDocument.search('___');
+                        const justName = document.nameDocument.slice(0, index___);
+
+                        if(document.type =='pdf')
+                        {
+                          return(
+                            <TouchableOpacity 
+                              onPress={ () => navigation.navigate('WatchPdf',{document: {}, downloadedFile: document, downloadedFileBoolean: true})}
+                              key={indexPdf} style={styles.cardDocument} >
+                              <Text style={styles.textNameCard}>{justName}</Text>
+                            </TouchableOpacity>
+                          )
+                        }
+                      })
+                    }
+                  </View>
+                )
+                :
+                (
+                  <Text>No has desgargado nada aún</Text>
+                )
+              }
           </ScrollView>
         <BottomBar navigation={navigation}/>
     </SafeAreaView>
@@ -154,5 +208,26 @@ const UserDocumentsScreen = ({navigation}) => {
 
 
 const styles = StyleSheet.create({
+  containerCards:{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1
+  }, 
 
+  cardDocument:{
+    width: Dimensions.get('window').width * 0.9,
+    marginVertical: 10,
+    padding: 15,
+    backgroundColor: Colors.MainBlue,
+    borderTopLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    
+  },
+  textNameCard:{
+    fontSize: 16,
+    color: '#fff'
+  },
 });

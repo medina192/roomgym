@@ -3,13 +3,8 @@ import {
   StyleSheet,
   View,
   Text,
-  StatusBar,
-  TextInput,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
-  Keyboard,
+  ActivityIndicator,
   TouchableOpacity,
-  Switch,
 } from 'react-native';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,6 +18,31 @@ const AskScreen = ({navigation}) => {
 
     const dispatch = useDispatch();
 
+    const [mainIndicator, setMainIndicator] = useState(true);
+
+    const user = useSelector(state => state.user);
+    const T_trainer = useSelector(state => state.T_trainer);
+    const state = useSelector(state => state.changeState);
+    
+
+
+  useEffect(() => {
+
+    if(!user == '')
+    {
+      navigation.navigate('MainUserScreen');
+    }
+    else if(!T_trainer == '')
+    {
+      navigation.navigate('MainTrainerScreen');
+    }
+    else{
+      //console.log('else');
+      //setMainIndicator(false);
+    }
+    
+  }, [state]);
+
     const verifyIfUserIsLogged = async() => {
         /*
         const username = 'zuck';
@@ -31,6 +51,7 @@ const AskScreen = ({navigation}) => {
         // Store the credentials
         const p = await Keychain.setGenericPassword(username, password);
         */
+
         try {
           // Retrieve the credentials
           const credentials = await Keychain.getGenericPassword();
@@ -40,11 +61,12 @@ const AskScreen = ({navigation}) => {
     
             if(credentials.password == '1')
             {
-              console.log('asd',userObject);
+              //setMainIndicator(false);
               dispatch(saveUser(userObject));
               navigation.navigate('MainUserScreen');
             }
             else{
+              //setMainIndicator(false);
               dispatch(T_saveTrainer(userObject));
               navigation.navigate('MainTrainerScreen');
             }
@@ -52,6 +74,7 @@ const AskScreen = ({navigation}) => {
           else {
             console.log('No credentials stored');
             //navigation.navigate('MainUserGeneralScreen');
+            setMainIndicator(false);
           }
         } catch (error) {
           console.log("Keychain couldn't be accessed!", error);
@@ -60,8 +83,12 @@ const AskScreen = ({navigation}) => {
       }
   
     useEffect(() => {
-      
+      console.log('use effect');
       verifyIfUserIsLogged();
+
+      return () => {
+        console.log('return [] ask screen');
+      }
   
     }, []);
 
@@ -69,20 +96,37 @@ const AskScreen = ({navigation}) => {
         navigation.navigate(newScreen);
     }
 
+   console.log('main indicator', mainIndicator);
+
     return (
         <>
-            <View style={styles.containerAskScreen}>
-                <Text style={styles.textQuestion}>¿Deseas registrarte o iniciar sesión?</Text>
-                <TouchableOpacity style={styles.buttonRegisterLogin} onPress={() => changeScreen('Login')} >
-                    <Text style={styles.textButttonregisterLogin}>Iniciar sesión</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonRegisterLogin} onPress={() => changeScreen('Register')} >
-                    <Text style={styles.textButttonregisterLogin}>Registrarme</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonContinue} onPress={() => changeScreen('MainUserGeneralScreen')} >
-                    <Text style={styles.textButtonConitnue}>Continuar sin registrarme</Text>
-                </TouchableOpacity>
-            </View>
+            {
+             mainIndicator ? 
+             (
+              <View style={styles.containerIndicator}>
+                <ActivityIndicator
+                  size={80}
+                  color={Colors.MainBlue}
+                  style={styles.activityIndicator}
+                />
+              </View>
+             ) 
+             :
+             (
+              <View style={styles.containerAskScreen}>
+                  <Text style={styles.textQuestion}>¿Deseas registrarte o iniciar sesión?</Text>
+                  <TouchableOpacity style={styles.buttonRegisterLogin} onPress={() => changeScreen('Login')} >
+                      <Text style={styles.textButttonregisterLogin}>Iniciar sesión</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.buttonRegisterLogin} onPress={() => changeScreen('Register')} >
+                      <Text style={styles.textButttonregisterLogin}>Registrarme</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.buttonContinue} onPress={() => changeScreen('MainUserGeneralScreen')} >
+                      <Text style={styles.textButtonConitnue}>Continuar sin registrarme</Text>
+                  </TouchableOpacity>
+              </View>
+             )
+            }
         </>
     );
 
@@ -91,6 +135,15 @@ const AskScreen = ({navigation}) => {
 export default AskScreen;
 
 const styles = StyleSheet.create({ 
+
+    containerIndicator:{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flex: 1
+    },
+
+
     containerAskScreen: {
         flex: 1,
         display: 'flex',

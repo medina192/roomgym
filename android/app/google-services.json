@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "572929800899",
+    "firebase_url": "https://reac-app-cursos.firebaseio.com",
+    "project_id": "reac-app-cursos",
+    "storage_bucket": "reac-app-cursos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572929800899:android:54fd1c62b23898f5c90076",
+        "android_client_info": {
+          "package_name": "com.roomgym"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "572929800899-coooukebrtnd2gtl558t3qvcjqgq38e2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZwbBHADI86MhOMv1qtSqjRxzWh8tZjfE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "572929800899-coooukebrtnd2gtl558t3qvcjqgq38e2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
