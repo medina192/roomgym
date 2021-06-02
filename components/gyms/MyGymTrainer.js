@@ -58,6 +58,7 @@ const MyGymTrainerScreen = ({navigation}) => {
 
   const [mainIndicator, setMainIndicator] = useState(true);
   const [addServices, setAddServices] = useState(false);
+  const [refreshState, setRefreshState] = useState(false);
 
   const [textInputValue, setTextInputValue] = useState({
     nombre: '',
@@ -101,9 +102,20 @@ const MyGymTrainerScreen = ({navigation}) => {
         if(response.data.resp.length > 0)
         {
           setMainIndicator(false);
-          if(dataGym.services && !dataGym.services == '')
-          {
 
+          if(dataGym.servicios && !dataGym.servicios == '')
+          {
+            setTextInputValue({
+              nombre:dataGym.nombre,
+              ciudad: dataGym.ciudad,
+              entidad: dataGym.entidad,
+              domicilio: dataGym.domicilio,
+              telefono: dataGym.telefono,
+              servicio: ''
+            });
+            const objectServices = JSON.parse(dataGym.servicios);
+            setListServices(objectServices);
+            setRefreshState(!refreshState);
           }
           else{
             setTextInputValue({
@@ -220,7 +232,7 @@ const MyGymTrainerScreen = ({navigation}) => {
     }
   }
 
-  const cancelService = () => {
+  const removeTextInputService = () => {
     setTextInputValue({
       ...textInputValue,
       servicio: ''
@@ -235,7 +247,9 @@ const MyGymTrainerScreen = ({navigation}) => {
 
     if(listServices.length > 0)
     {
-
+      listServices.push(textInputValue.servicio);
+      setListServices(listServices);
+      setRefreshState(!refreshState);
     }
     else{
       let auxService = []
@@ -243,28 +257,41 @@ const MyGymTrainerScreen = ({navigation}) => {
       setListServices(auxService);
       
     }
-    cancelService();
+    removeTextInputService();
   }
 
 
 
   const saveData = () => {
 
-    if( nombre == '' || ciudad == '' || entidad == '' || domicilio == '' || telefono == '')
+    if( textInputValue.nombre == '' || textInputValue.ciudad == '' 
+    || textInputValue.entidad == '' || textInputValue.domicilio == '' || textInputValue.telefono == '')
     {
       // empty fields alert
+      
+      setShowAlert({
+        show: true,
+        type: 'error',
+        action: 'close', 
+        message: 'Te faltan campos por llenar', 
+        title: 'Datos incompletos', 
+        iconAlert: 'times',
+        nextScreen: 'MyGymTrainer'
+      });
     }
     else{
+
+      setMainIndicator(true);
 
       let servicesString = '';
       if(listServices.length > 0)
       {
-        servicesString = JSON.parse(listServices);
+        servicesString = JSON.stringify(listServices);
       }
 
 
       axios({
-        method: 'get',
+        method: 'put',
         url: `${serverUrl}/gyms/updategym`,
         data: {
           nombre: textInputValue.nombre,
@@ -272,19 +299,52 @@ const MyGymTrainerScreen = ({navigation}) => {
           entidad: textInputValue.entidad,
           domicilio: textInputValue.domicilio,
           telefono: textInputValue.telefono,
-          servicios: servicesString
+          servicios: servicesString,
+          idEntrenador: T_trainer.idusuario
         }
       })
       .then(function (response) {
+
         console.log('resp', response);
+        setMainIndicator(false);
+        setShowAlert({
+          show: true,
+          type: 'good',
+          action: 'close', 
+          message: 'Tu gimnasio se ha actualizado', 
+          title: 'Enhorabuen', 
+          iconAlert: 'check',
+          nextScreen: 'MyGymTrainer'
+        });
+      
       }).catch(error => {
         console.log('error', error);
+        setMainIndicator(false);
+        if(error.request._response.slice(0,17) === 'Failed to connect')
+        {
+
+          setShowAlert({
+            show: true,
+            type: 'error',
+            action: 'close', 
+            message: 'Verifica tu conexión a internet o notifica al equipo de GymRoom sobre el problema', 
+            title: 'No se pudo conectar con el servidor', 
+            iconAlert: 'wifi',
+            nextScreen: 'MyGymTrainer'
+          });
+        }
       })
     }
   }
 
-  console.log('services', listServices);
-  console.log('text', textInputValue);
+  const cancelService = (index) => {
+
+    listServices.splice(index,1);
+    setListServices(listServices);
+    setRefreshState(!refreshState);
+  }
+
+
 
   return (
     <>
@@ -363,13 +423,20 @@ const MyGymTrainerScreen = ({navigation}) => {
                       />
                     </View>
 
-
-                    <View>
+                    <Text style={styles.titleServices}>Servicios</Text>
+                    <View style={styles.containerServices}>
                         {
                            listServices.map((service, indexService) => {
-                             <View>
-                               <Text>hola</Text>
-                             </View>
+                              return(
+                                <View key={indexService} style={styles.containerService}>
+                                  <Text style={styles.textService}>{service}</Text>
+                                  <TouchableOpacity
+                                    onPress={() => cancelService(indexService)}
+                                  >
+                                    <Icon name="times" size={24} style={styles.iconCancelService} color="#fff" />
+                                  </TouchableOpacity>
+                                </View>
+                              )
                            })    
                         }
                     </View>
@@ -394,7 +461,7 @@ const MyGymTrainerScreen = ({navigation}) => {
                             <View style={styles.containerButtonServices}>
                             <TouchableOpacity 
                               style={styles.buttonServices}
-                              onPress={cancelService}
+                              onPress={removeTextInputService}
                             >
                               <Text style={styles.textButtonServices}>Cancelar</Text>
                             </TouchableOpacity>
@@ -430,7 +497,7 @@ const MyGymTrainerScreen = ({navigation}) => {
                         style={styles.buttonSaveGym}
                         onPress={saveData}
                       >
-                        <Text style={styles.textButton}>Guardar</Text>
+                        <Text style={styles.textButton}>Actualizar</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -535,5 +602,42 @@ const styles = StyleSheet.create({
       fontWeight: '700',
       color: '#fff',
       padding: 10
+    },
+
+    titleServices:{
+      fontSize: 24,
+      fontWeight: '700', 
+      color: Colors.MainBlue,
+      marginTop: 15,
+      marginBottom: 10
+    },
+    containerServices: {
+
+    },
+    containerService:{
+      marginVertical: 10,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderColor: Colors.MainBlue,
+      borderBottomWidth: 1,
+      borderTopWidth: 1,
+      borderLeftWidth: 1,
+      borderRightWidth: 1,
+      borderBottomRightRadius: 10,
+      borderBottomLeftRadius: 10,
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      padding: 5
+    },
+    textService:{
+      fontSize: 18,
+      marginLeft: 10,
+      color: Colors.MainBlue
+    },
+    iconCancelService:{
+      color: Colors.MainBlue,
+      marginRight: 10
     },
 });

@@ -16,6 +16,8 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import { Icon as icon } from 'react-native-vector-icons/Fontisto';
+
 import TopBar from '../shared/TopBar';
 
 import Colors from '../../colors/colors';
@@ -41,6 +43,8 @@ import RNFetchBlob from 'rn-fetch-blob';
 
 import DocumentPicker from 'react-native-document-picker';
 
+import LinearGradient from 'react-native-linear-gradient';
+
 const Drawer = createDrawerNavigator();
 
 export default function MainTrainerScreen({navigation}) {
@@ -54,13 +58,14 @@ export default function MainTrainerScreen({navigation}) {
   );
 }
 
+
 const TrainerScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
   const T_trainer = useSelector(state => state.T_trainer);
   const state = useSelector(state => state.changeState);
-  
+  console.log('T', T_trainer);
 
   useEffect(() => {
     
@@ -71,8 +76,6 @@ const TrainerScreen = ({navigation}) => {
   }, []);
 
 
-      
-  console.log('----------------- main trainer screen');
   const [showButtonPhoto, setShowButtonPhoto] = useState(true);
   const [showButtonVideo, setShowButtonVideo] = useState(true);
   const [showButtonPdf, setShowButtonPdf] = useState(true);
@@ -507,94 +510,73 @@ const TrainerScreen = ({navigation}) => {
     */
   }
 
+  const cancelPhoto = () => {
+    setShowButtonPhoto(true);
+    setImageAdded({
+      boolean: false,
+      data: {}
+    });
+  }
+
+  const cancelVideo = () => {
+    setShowButtonVideo(true);
+    setVideoAdded({
+      boolean: false,
+      data: {}
+    });
+  }
+
 
   return (
     <>
       <TopBar navigation={navigation} title={`Bienvenido Entrenador`} returnButton={false} />
       
-      <ScrollView>
-
-        <View style={styles.containerTrainerCard}>
-          <View style={styles.trainerCard}>
-            <View style={styles.containerImage_Name}>
-                <Icon name="user-o" size={24} style={styles.iconImage} color="#fff" />
-              <Text style={styles.trainerName}>Alejandro Díaz Medina</Text>
+      <ScrollView style={{flex: 1, backgroundColor: Colors.White}}>
+        <LinearGradient colors={[Colors.MainBlue, Colors.White]}>
+          <View style={styles.containerTrainerCard}>
+            <View style={styles.trainerCard}>
+              <Text style={styles.trainerName}>{T_trainer.nombres+' '+T_trainer.apellidos}</Text>
+              <Text style={styles.trainerDescription}>{T_trainer.descripcion_entrenador}</Text>
             </View>
-            <View style={styles.containerDescription}>
-              <Text style={styles.description}>
-                survived not only five centuries, but also the leap into electronic 
-                typesetting, remaining essentially unchanged. It was popularised in the 1960s
-                with the release of Letraset sheets containing Lorem Ipsum passages, and more
-                recently with desktop publishing software like Aldus PageMaker including 
-                versions of Lorem Ipsum
-              </Text>
-            </View>
-            <View style={styles.containerContactInformation}>
-                <Icon name="envelope" size={24} style={styles.iconContact} color="#fff" />
-                <Icon name="instagram" size={24} style={styles.iconContact} color="#fff" />
-                <Icon name="facebook-square" size={24} style={styles.iconContact} color="#fff" />
-                <Icon name="twitter-square" size={24} style={styles.iconContact} color="#fff" />
-            </View>
-          </View>
-        </View>
 
-        {
-          /*
-        <View style={styles.containerAdvices}> 
-          <View style={styles.advice}>
-            <Text style={styles.adviceTitle}>Consejo 1</Text>
-            <Text style={styles.advicedescription}>
-                with the release of Letraset sheets containing Lorem Ipsum passages, and more
-                recently with desktop publishing software like Aldus PageMaker including 
-                versions of Lorem Ipsum
-            </Text>
-          </View>
-        </View>
-        <View style={styles.containerAdvices}> 
-          <View style={styles.advice}>
-            <Text style={styles.adviceTitle}>Consejo 2</Text>
-            <Text style={styles.advicedescription}>
-                with the release of Letraset sheets containing Lorem Ipsum passages, and more
-                recently with desktop publishing software like Aldus PageMaker including 
-                versions of Lorem Ipsum
-            </Text>
-          </View>
-        </View>
-          */
-        }
+            <View style={styles.optionsCard}>
+              <View style={styles.containerFlexRow}>
+                <Text style={styles.titleOption}>Subir foto</Text>
 
-        {
+
+                {
+                  showButtonPhoto ?
+                  (
+                    <TouchableOpacity 
+                      onPress={() => setShowButtonPhoto(false)}
+                      style={styles.buttonIconShowOptions}>
+                      <Icon name="angle-double-down" size={24} style={styles.iconShowOptions} color="#fff" />
+                    </TouchableOpacity>
+                    
+                  )
+                  :
+                  (
+                    <>
+                    </>
+                  )
+                }
+
+              </View>
+
+                
+              <View style={styles.blueLine}></View>
+
+              {
           showButtonPhoto ? 
           (
-            <TouchableOpacity 
-              onPress={() => setShowButtonPhoto(false)}
-              style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-              <Text>Añadir foto</Text>
-            </TouchableOpacity>
+            <>
+            </>
           )
           :
           (
-            <View style={styles.containerFileOptions}>
-              <Text style={{fontSize: 16, marginTop: 10, marginBottom: 5}}>Nombre Imagen</Text>
-              <View style={styles.containerBorderFileOptions}>
-                  <TextInput 
-                      style={styles.nameInput}
-                      placeholderTextColor="#000"
-                      multiline={false}
-                      onChangeText={ (text) => setImageNameInputValue(text)}
-                  />
-              </View>
+            <View style={styles.containerOptionsCard}>
+              <Text style={styles.nameFile}>Nombre Imagen</Text>
 
-              <TouchableOpacity 
-                onPress={takePhoto}
-                style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-                <Text>Tomar foto</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                onPress={galleryPhoto}
-                style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-                <Text>subir foto de la galería</Text>
-              </TouchableOpacity>
 
               <View>
               {
@@ -605,17 +587,45 @@ const TrainerScreen = ({navigation}) => {
                             width: 300, 
                             height: 300}} />
 
-                    <Text>Has añadido una imagen exitosamente</Text>
+                          <Text 
+                            style={{color: '#080', marginVertical: 5, textAlign: 'center'}}
+                          >
+                              Has añadido una imagen exitosamente¡
+                          </Text>
                   </>
                 )
                 :
                 (
-                  <Text>No has añadido una imagen aún</Text>
+                  <View style={styles.falseImage}>
+                   <View style={styles.containerBorderFileOptions}>
+                        <TextInput 
+                            style={styles.nameInput}
+                            placeholderTextColor="#000"
+                            multiline={false}
+                            onChangeText={ (text) => setImageNameInputValue(text)}
+                        />
+                    </View>
+                    <Text style={{color: Colors.alertRed}}>No has añadido una imagen aún</Text>
+                  </View>
                 )
               }
               </View>
 
-              <Text>¿Deseas que la imagen sea publica?</Text>
+              <View style={styles.containerFlexRowOptionsButtons}>
+                <TouchableOpacity 
+                  onPress={takePhoto}
+                  style={styles.optionsButtons}>
+                  <Text style={styles.textButtonOptions}>Tomar foto</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  onPress={galleryPhoto}
+                  style={styles.optionsButtons}>
+                  <Text  style={styles.textButtonOptions}>Galería</Text>
+                </TouchableOpacity>
+              </View>
+
+
+              <Text style={styles.textQuestion}>¿Deseas que la imagen sea publica?</Text>
               <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}
                   thumbColor={imagePublic ? Colors.MainBlue : "#f4f3f4"}
@@ -624,7 +634,7 @@ const TrainerScreen = ({navigation}) => {
                   value={imagePublic}
               />
 
-              <Text>¿Deseas que la imagen se muestre en tu perfil?</Text>
+              <Text style={styles.textQuestion}>¿Deseas que la imagen se muestre en tu perfil?</Text>
               <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}
                   thumbColor={imageShowInPerfil ? Colors.MainBlue : "#f4f3f4"}
@@ -633,11 +643,13 @@ const TrainerScreen = ({navigation}) => {
                   value={imageShowInPerfil}
               />
 
+              <View style={styles.blueLine}></View>
+
               <View style={styles.containerButtonsCheck}>          
                   <TouchableOpacity
-                    onPress={() => setShowButtonPhoto(true)}
+                    onPress={cancelPhoto}
                     style={styles.containerIconButtonClose}>
-                    <Icon name="close" size={24} style={styles.iconButtonClose} color="#fff" />
+                    <Icon name="angle-double-up" size={24} style={styles.iconButtonClose} color="#fff" />
                   </TouchableOpacity>
                   <TouchableOpacity
                       onPress={savePhoto}
@@ -650,151 +662,227 @@ const TrainerScreen = ({navigation}) => {
           )
         }
 
+            </View>
 
 
-        {
-      
+
+
+{
+  //___________________________________________________________________________
+}
+
+            <View style={styles.optionsCard}>
+              <View style={styles.containerFlexRow}>
+                <Text style={styles.titleOption}>Subir Video</Text>
+                {
+                  showButtonVideo ?
+                  (
+                    <TouchableOpacity 
+                      onPress={() => setShowButtonVideo(false)}
+                      style={styles.buttonIconShowOptions}>
+                      <Icon name="angle-double-down" size={24} style={styles.iconShowOptions} color="#fff" />
+                    </TouchableOpacity>
+                    
+                  )
+                  :
+                  (
+                    <>
+                    </>
+                  )
+                }
+
+              </View>
+
+                
+              <View style={styles.blueLine}></View>
+
+              {
           showButtonVideo ? 
           (
-            <TouchableOpacity 
-              onPress={() => setShowButtonVideo(false)}
-              style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-              <Text>Añadir video</Text>
-            </TouchableOpacity>
+            <>
+            </>
           )
           :
           (
-            <View style={styles.containerFileOptions}>
-              <Text style={{fontSize: 16, marginTop: 10, marginBottom: 5}}>Nombre Video</Text>
-              <View style={styles.containerBorderFileOptions}>
-                  <TextInput 
-                      style={styles.nameInput}
-                      placeholderTextColor="#000"
-                      multiline={false}
-                      onChangeText={ (text) => setVideoNameInputValue(text)}
-                  />
-              </View>
+            <View style={styles.containerOptionsCard}>
+              <Text style={styles.nameFile}>Nombre Video</Text>
 
-              <TouchableOpacity 
-                onPress={takeVideo}
-                style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-                <Text>Tomar video</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                onPress={galleryVideo}
-                style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-                <Text>subir video de la galería</Text>
-              </TouchableOpacity>
 
               <View>
               {
-                videoAdded.boolean ? 
+                 videoAdded.boolean ? 
                 (
-                  <>            
-                  <View style={{height: 200, width: 200, backgroundColor: '#444'}}>
-                                  <Video source={{uri: videoAdded.object.uri}}   // Can be a URL or a local file.
-                        style={{ flex: 1 }}
-                        //controls={true}
-                        resizeMode="contain"
-                      />
-                  </View>
-                  <Text>Has añadido un video exitosamente</Text>
+                  <>
+                      <View style={{height: 200, width: 200, backgroundColor: '#444'}}>
+                                      <Video source={{uri: videoAdded.object.uri}}   // Can be a URL or a local file.
+                            style={{ flex: 1 }}
+                            //controls={true}
+                            resizeMode="contain"
+                          />
+                      </View>
+
+                          <Text 
+                            style={{color: '#080', marginVertical: 5, textAlign: 'center'}}
+                          >
+                              Has añadido un video exitosamente¡
+                          </Text>
                   </>
                 )
                 :
                 (
-                  <Text>No has añadido un video aún</Text>
+                  <View style={styles.falseImage}>
+                   <View style={styles.containerBorderFileOptions}>
+                        <TextInput 
+                            style={styles.nameInput}
+                            placeholderTextColor="#000"
+                            multiline={false}
+                            onChangeText={ (text) => setVideoNameInputValue(text)}
+                        />
+                    </View>
+                    <Text style={{color: Colors.alertRed}}>No has añadido ningún video aún</Text>
+                  </View>
                 )
               }
               </View>
 
-              <Text>¿Deseas que el video sea publico?</Text>
+              <View style={styles.containerFlexRowOptionsButtons}>
+                <TouchableOpacity 
+                  onPress={takeVideo}
+                  style={styles.optionsButtons}>
+                  <Text style={styles.textButtonOptions}>Tomar Video</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  onPress={galleryVideo}
+                  style={styles.optionsButtons}>
+                  <Text  style={styles.textButtonOptions}>Galería</Text>
+                </TouchableOpacity>
+              </View>
+
+
+              <Text style={styles.textQuestion}>¿Deseas que el video sea publica?</Text>
               <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}
-                  thumbColor={imagePublic ? Colors.MainBlue : "#f4f3f4"}
+                  thumbColor={videoPublic ? Colors.MainBlue : "#f4f3f4"}
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={() => setVideoPublic(!videoPublic)}
                   value={videoPublic}
               />
 
-              <Text>¿Deseas que el video se muestre en tu perfil?</Text>
+              <Text style={styles.textQuestion}>¿Deseas que la imagen se muestre en tu perfil?</Text>
               <Switch
                   trackColor={{ false: "#767577", true: "#81b0ff" }}
-                  thumbColor={imageShowInPerfil ? Colors.MainBlue : "#f4f3f4"}
+                  thumbColor={videoShowInPerfil ? Colors.MainBlue : "#f4f3f4"}
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={() => setVideoShowInPerfil (!videoShowInPerfil)}
                   value={videoShowInPerfil}
               />
 
+              <View style={styles.blueLine}></View>
+
               <View style={styles.containerButtonsCheck}>          
                   <TouchableOpacity
-                    onPress={() => setShowButtonVideo(true)}
+                    onPress={cancelVideo}
                     style={styles.containerIconButtonClose}>
-                    <Icon name="close" size={24} style={styles.iconButtonClose} color="#fff" />
+                    <Icon name="angle-double-up" size={24} style={styles.iconButtonClose} color="#fff" />
                   </TouchableOpacity>
                   <TouchableOpacity
                       onPress={saveVideo}
                       style={styles.containerIconButtonAdd}>
                       <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
                   </TouchableOpacity>
-            </View>              
+              </View>              
+
+            </View>
+            )
+          }
 
           </View>
-          )
-        }
 
 
-        <TouchableOpacity 
-          onPress={ () => navigation.navigate('CreatePdf')}
-          style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-          <Text>Crear archivo pdf</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity 
-          onPress={ () => navigation.navigate('CreateGym')}
-          style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-          <Text>Registrar Gimnasio</Text>
-        </TouchableOpacity>
+{
+  //_________________________________
+}
 
 
-        <TouchableOpacity 
-          onPress={ () => navigation.navigate('MyGymTrainer')}
-          style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-          <Text>Ver mi gimnasio</Text>
-        </TouchableOpacity>   
+            <View style={styles.optionsCard}>
+              <View style={styles.containerFlexRow}>
+                <Text style={styles.titleOption}>Crear Pdf</Text>
 
-        <TouchableOpacity s
-          onPress={ () => navigation.navigate('UploadPdf') }
-          style={{backgroundColor: '#0f0', padding: 10, marginTop: 10, width: '40%', marginLeft: 20}}>
-          <Text>Subir Pdf</Text>
-        </TouchableOpacity>   
+                <TouchableOpacity 
+                      onPress={() => navigation.navigate('CreatePdf')}
+                      style={styles.buttonIconShowOptions}>
+                      <Icon name="angle-double-right" size={24} style={styles.iconShowOptions} color="#fff" />
+                </TouchableOpacity>
 
+              </View>
+              <View style={styles.blueLine}></View>
+            </View>
+
+
+            <View style={styles.optionsCard}>
+              <View style={styles.containerFlexRow}>
+                <Text style={styles.titleOption}>Subir Pdf</Text>
+
+                <TouchableOpacity 
+                      onPress={() => navigation.navigate('UploadPdf')}
+                      style={styles.buttonIconShowOptions}>
+                      <Icon name="angle-double-right" size={24} style={styles.iconShowOptions} color="#fff" />
+                </TouchableOpacity>
+
+              </View>
+              <View style={styles.blueLine}></View>
+            </View>
+
+
+
+            <View style={styles.optionsCard}>
+              <View style={styles.containerFlexRow}>
+                <Text style={styles.titleOption}>Actualizar Gimnasio</Text>
+
+                <TouchableOpacity 
+                      onPress={ () => navigation.navigate('MyGymTrainer')}
+                      style={styles.buttonIconShowOptions}>
+                      <Icon name="angle-double-right" size={24} style={styles.iconShowOptions} color="#fff" />
+                </TouchableOpacity>
+
+              </View>
+              <View style={styles.blueLine}></View>
+            </View>
+
+
+
+            <View style={styles.optionsCard}>
+              <View style={styles.containerFlexRow}>
+                <Text style={styles.titleOption}>Registrar Gimnasio</Text>
+
+                <TouchableOpacity 
+                      onPress={ () => navigation.navigate('CreateGym')}
+                      style={styles.buttonIconShowOptions}>
+                      <Icon name="angle-double-right" size={24} style={styles.iconShowOptions} color="#fff" />
+                </TouchableOpacity>
+
+              </View>
+              <View style={styles.blueLine}></View>
+            </View>
+
+
+        </View>
+
+        </LinearGradient>
 
 
    
-        <View style={styles.containerButtonSubscribe}>
+{
+  /*
+          <View style={styles.containerButtonSubscribe}>
           <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('CreateNotes')}>
             <Text style={styles.textButoonSubscribe}>Crear nota</Text>
           </TouchableOpacity>
         </View>
+  */
+}
 
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('MainUserScreen')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Usuario</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('Registro')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Registro</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('Login')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Login</Text>
-          </TouchableOpacity>
-        </View>
 
       </ScrollView>
 
@@ -805,16 +893,137 @@ const TrainerScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   containerTrainerCard:{
-    paddingHorizontal: 15,
-    paddingVertical: 20,
+    paddingVertical: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   trainerCard:{
-    backgroundColor: "#244EABa0",
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: "#fff",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 10,
+        height: 15,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    elevation: 5,
+    width: Dimensions.get('window').width * 0.9,
+    marginBottom: 40
   },
+  trainerName:{
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.MainBlue,
+  },
+  trainerDescription:{
+    fontSize: 16,
+    marginTop: 5,
+    color: Colors.MainBlue
+  },
+
+  optionsCard:{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 10,
+        height: 15,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    elevation: 5,
+    width: Dimensions.get('window').width * 0.9,
+    marginVertical: 10
+  },
+  containerFlexRow:{
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: Dimensions.get('window').width * 0.8
+  },
+  titleOption:{
+    color: Colors.MainBlue,
+    fontSize: 20,
+    fontWeight: '700'
+  },
+  buttonIconShowOptions:{
+  },
+  iconShowOptions:{
+    color: Colors.MainBlue,
+    fontSize: 28
+  },
+
+  blueLine:{
+    width: Dimensions.get('window').width * 0.8,
+    height: 1,
+    backgroundColor: Colors.MainBlue,
+    marginTop: 10,
+    marginBottom: 10
+  },
+
+  // hide options
+  containerOptionsCard:{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff'
+  },
+  containerFlexRowOptionsButtons:{
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 10
+  },
+  nameFile:{
+    fontSize: 18, 
+    marginVertical: 10, 
+    fontWeight: '700', 
+    color: Colors.MainBlue
+  },
+  falseImage:{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  optionsButtons:{
+    backgroundColor: Colors.MainBlue,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    padding: 10,
+    marginHorizontal: 10
+  },
+  textButtonOptions:{
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16
+  },
+  textQuestion:{
+    fontSize: 16,
+    color: Colors.MainBlue,
+    marginTop: 10
+  },
+
+
   containerImage_Name:{
     display: 'flex',
     flexDirection: 'row',
@@ -827,11 +1036,7 @@ const styles = StyleSheet.create({
     fontSize: 80,
     color: '#fff'
   },
-  trainerName:{
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#fff'
-  },  
+
   containerDescription:{
     paddingHorizontal: 15,
     paddingVertical: 15
@@ -899,21 +1104,7 @@ const styles = StyleSheet.create({
     fontWeight: '700'
   },
 
-  // bottom bar
-  containerBottomBar:{
-    width: '100%',
-    height: 'auto',
-    paddingVertical: 10,
-    backgroundColor: Colors.MainBlue,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center'
-  },
-  iconBottomBar:{
-    fontSize: 35,
-    color: '#fff'
-  },
+
 
 
 
@@ -937,8 +1128,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 5,
     borderBottomLeftRadius: 5,
     borderColor: '#000',
-    width: '85%',
-    height: 50
+    height: 80,
+    width: 80,
+    marginBottom: 10
   },
   nameInput:{
     color: '#000',
@@ -952,7 +1144,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingVertical: 10
+    width: '100%',
+    marginTop: 10
   },
   containerIconButtonAdd:{
     borderTopLeftRadius: 40,
@@ -962,9 +1155,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems:'center',
-    backgroundColor: '#0d0',
-    width: 40,
-    height: 40,
+    backgroundColor: Colors.Orange,
+    width: 50,
+    height: 50,
     marginHorizontal: 5
   },
   containerIconButtonClose:{
@@ -975,16 +1168,16 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems:'center',
-    backgroundColor: '#d00',
-    width: 40,
-    height: 40,
+    backgroundColor: Colors.MainBlue,
+    width: 50,
+    height: 50,
     marginHorizontal: 5
   },
   iconButtonAdd:{
-    fontSize: 22,
+    fontSize: 28,
   },
   iconButtonClose:{
-    fontSize: 22,
+    fontSize: 28,
   },
 
 });

@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 10,
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
+        
     },
     backgroundColorIconError:{
         backgroundColor: Colors.alertRed,

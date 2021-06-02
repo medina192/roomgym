@@ -20,10 +20,16 @@ import Colors from '../../colors/colors';
 
 import * as Keychain from 'react-native-keychain';
 
+import { useDispatch, useSelector } from 'react-redux';
+
+import { clearState } from '../../store/actions/actionsReducer';
+
 const SideBarTrainer = ({navigation}) => {
 
+    const dispatch = useDispatch();
 
     const deleteSecureStorage = async() => {
+        dispatch(clearState());
         await Keychain.resetGenericPassword();
         navigation.navigate('Login');
     }

@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {
   StyleSheet,
@@ -64,6 +64,7 @@ import CreateGym from './components/gyms/CreateGym';
 import MyGymTrainer from './components/gyms/MyGymTrainer';
 import UploadPdf from './components/mainTrainer/notes/UploadPdf';
 
+import SplashScreen from 'react-native-splash-screen'
 
 const Stack = createStackNavigator();
 
@@ -72,6 +73,11 @@ const store = createStore(mainReducer);
 const App = () => {
 
   let initialRoute = 'AskScreen';
+
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+
 
   return (
     <Provider store={store}>
