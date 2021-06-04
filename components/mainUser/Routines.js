@@ -5,12 +5,13 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 
 
-import { useDispatch } from 'react-redux';
-
 import TopBar from '../shared/TopBar';
+
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -21,6 +22,11 @@ import BottomBar from '../shared/BottomBarUser';
 import { routines } from '../../services/routines';
 
 import { saveSubCategorie } from '../../store/actions/actionsReducer';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { ScrollView } from 'react-native-gesture-handler';
+
+import Colors from '../../colors/colors';
 
 const Drawer = createDrawerNavigator();
 
@@ -39,84 +45,106 @@ const RoutinesScreen = ({navigation}) => {
   
   const dispatch = useDispatch();
 
-  const changeToSubCategorie = (name) => {
-    dispatch(saveSubCategorie(name));
+  const categories = Object.keys(routines);
+
+  const changeToCategorie = (categorie) => {
+    
+    const subCategories = Object.values(routines[categorie]);
+
+    const auxObject = {categorie, subCategories}
+    dispatch(saveSubCategorie(auxObject));
     navigation.navigate('SubCategories');
   }
+
+
   
   return (
-    <>
-      <TopBar navigation={navigation} title={`Rutinas`} returnButton={true} />
- 
-      <View style={styles.containerScrollView}>
-        <FlatList
-          data={routines}
-          renderItem= { (routine) =>               
-              (
-                <View style={styles.containerTouchableImage}>
-                  <TouchableOpacity style={styles.touchableContainerImage}
-                   onPress={() => changeToSubCategorie(routine.item)} >
-                      <Text style={styles.textImageButton}>{routine.item.name}</Text>
-                  </TouchableOpacity>
-                </View>
-              )
+    <View style={{flex: 1, position: 'relative'}}>
+      <TopBar navigation={navigation} title={'Categorias'} returnButton={true} />
+        <ScrollView style={{flex: 1 }}>
+          <View style={styles.containerScrollView}>
+            {
+              categories.map((categorie, indexCategorie) => {
+
+                let categorieUpperCase = categorie[0].toUpperCase() + categorie.slice(1,categorie.length );
+                return(
+                  <View key={indexCategorie} style={styles.optionsCard}>
+                    <View style={styles.containerFlexRow}>
+                      <Text style={styles.titleOption}>{categorieUpperCase}</Text>
+
+                      <TouchableOpacity 
+                            onPress={() => changeToCategorie(categorie)}
+                            style={styles.buttonIconShowOptions}>
+                            <Icon name="angle-double-right" size={24} style={styles.iconShowOptions} color="#fff" />
+                      </TouchableOpacity>
+
+                    </View>
+                    <View style={styles.blueLine}></View>
+                  </View>
+                )
+              })
             }
-          keyExtractor= { (item, key) => key}
-                    />
-      </View>
+          </View>
+        </ScrollView>
       <BottomBar navigation={navigation}/>
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   containerScrollView:{
-    flex: 1
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center'
   },
-  containerTouchableImage:{
-    height: 150,
-    width: '100%',
-    backgroundColor: '#fff',
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingHorizontal: 25,
-    marginBottom: 10
-  },
-  touchableContainerImage:{
-    height: '100%',
-    width: '100%',
-    backgroundColor: '#123456',
+  
+  
+  optionsCard:{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: "#fff",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    overflow: 'hidden', 
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 10,
+        height: 15,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    elevation: 5,
+    width: Dimensions.get('window').width * 0.9,
+    marginVertical: 10
   },
-  imageButton: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "center"
-  },
-  textImageButton:{
-    color: "white",
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
-    backgroundColor: "#244EABa0"
-  },  
-  containerTextDescriptionButton:{
-    paddingHorizontal: 10,
+  containerFlexRow:{
     display: 'flex',
-    justifyContent: 'center',
-    alignItems:'center'
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: Dimensions.get('window').width * 0.8
   },
-  textDescriptionButton:{
+  titleOption:{
+    color: Colors.MainBlue,
     fontSize: 20,
-    textAlign: 'center',
     fontWeight: '700'
   },
-  textDescriptionButtonSubtitle:{
-    fontSize: 14,
-    marginTop: 5
+  buttonIconShowOptions:{
   },
+  iconShowOptions:{
+    color: Colors.MainBlue,
+    fontSize: 28
+  },
+
+  blueLine:{
+    width: Dimensions.get('window').width * 0.8,
+    height: 1,
+    backgroundColor: Colors.MainBlue,
+    marginTop: 10,
+    marginBottom: 10
+  },  
+
 });

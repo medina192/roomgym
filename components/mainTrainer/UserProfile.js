@@ -4,7 +4,8 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 
 import axios from 'axios';
@@ -25,6 +26,8 @@ import { saveIdRelation } from '../../store/actions/actionsReducer';
 
 import { urlServer } from '../../services/urlServer';
 
+
+
 const Drawer = createDrawerNavigator();
 
 export default function UserProfile() {
@@ -41,6 +44,7 @@ const UserProfileScreen = ({navigation}) => {
 
   const serverUrl = urlServer.url;
 
+  const [loadingRoutines, setLoadingRoutines] = useState(true);
   const [userSubscribed, setUserSubscribed] = useState({
     state_subscription: 0,
     userSubscribedStatus: false
@@ -74,11 +78,13 @@ const UserProfileScreen = ({navigation}) => {
           console.log('if');
           //let r = JSON.parse(response.data.resp);
           //console.log('r---------', r);
+          setLoadingRoutines(false);
           setRoutines(routinesString);
           
         }
         else{
           console.log('else');
+          setLoadingRoutines(false);
         }
 
     })
@@ -162,7 +168,6 @@ const UserProfileScreen = ({navigation}) => {
   return (
     <>
        <TopBar navigation={navigation} title={'user profile'} returnButton={true}/>
-
         <ScrollView style={{padding: 15, flex: 1, marginBottom: 10}}>
           <View style={styles.trainerCard}>
             <View style={styles.containerImage_Name}>
@@ -196,39 +201,60 @@ const UserProfileScreen = ({navigation}) => {
                 </View>
               </View>
 
-              <Text>Rutinas</Text>
+              <Text style={styles.textRutinas}>Rutinas</Text>
+
+              <View style={styles.blueLine}></View>
               
                 <View>
-                {
-                  (routines.length > 0) ?
-                  
-                    
-                      routines.map((routine, index) => {
-                        //let routineObject = JSON.parse(routine.ejercicios);
-                        let exercises = JSON.parse(routine.ejercicios);
-                        return(
-                          <View key={index} style={styles.routineCard}>
-                            <Text style={{fontSize: 18, color: '#fff'}}>{routine.nombre}</Text>
-                             {
-                               exercises.map((rutina, indexRutina) => {
-                                
-                                return(
-                                  <View key={indexRutina}>
-                                    <Text style={styles.textRoutineCard}>{rutina.name}</Text>
-                                  </View>
-                                )
-                               })
-                             }
+                  {
+                    loadingRoutines ? 
+                    (
+                      <View style={styles.containerIndicator}>
+                      <ActivityIndicator
+                        size={80}
+                        color={Colors.MainBlue}
+                        style={styles.activityIndicator}
+                      />
+                    </View>
+                    )
+                    :
+                    (
+                      <View>
+                                              {
+                        (routines.length > 0) ?
+                        
+                          
+                            routines.map((routine, index) => {
+                              //let routineObject = JSON.parse(routine.ejercicios);
+                              let exercises = JSON.parse(routine.ejercicios);
+                              return(
+                                <View key={index} style={styles.routineCard}>
+                                  <Text style={{fontSize: 18, color: '#fff'}}>{routine.nombre}</Text>
+                                   {
+                                     exercises.map((rutina, indexRutina) => {
+                                      
+                                      return(
+                                        <View key={indexRutina}>
+                                          <Text style={styles.textRoutineCard}>{rutina.name}</Text>
+                                        </View>
+                                      )
+                                     })
+                                   }
+                                </View>
+                              )
+                             })
+                          
+                        
+                        :
+                        (
+                          <View style={styles.containerTextWithoutRoutines}>
+                            <Text style={styles.textWithoutRoutines}>No has asignado rutinas aún a este usuario</Text>
                           </View>
                         )
-                       })
-                    
-                  
-                  :
-                  (
-                    <Text></Text>
-                  )
-                }
+                      }
+                      </View>
+                    )
+                  }
                 </View>
               </ScrollView>
 
@@ -238,6 +264,15 @@ const UserProfileScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
+
+    containerIndicator:{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20
+    },
+
+
     containerTrainerCard:{
         paddingHorizontal: 15,
         paddingVertical: 20,
@@ -291,7 +326,18 @@ const styles = StyleSheet.create({
     containerRoutines:{
       flex: 1,
     },  
-
+    textRutinas:{
+      fontSize: 18,
+      color: Colors.MainBlue,
+      fontWeight: '700',
+    },
+    blueLine:{
+      height: 2,
+      width: '100%',
+      backgroundColor: Colors.MainBlue,
+      marginTop: 3,
+      marginBottom: 10
+    },
     routineCard:{
       marginBottom: 20,
       backgroundColor: Colors.MainBlue,
@@ -305,6 +351,23 @@ const styles = StyleSheet.create({
     textRoutineCard:{
       color: '#fff',
       fontSize: 16
+    },
+    containerTextWithoutRoutines:{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    textWithoutRoutines:{
+      backgroundColor: "#999",
+      color: '#fff',
+      fontWeight: '700',
+      fontSize: 16,
+      padding: 8,
+      marginTop: 15,
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
     },
 
     // button subscribe
@@ -329,5 +392,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700'
   },
+
+
+
 });
 

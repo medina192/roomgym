@@ -65,6 +65,8 @@ import MyGymTrainer from './components/gyms/MyGymTrainer';
 import UploadPdf from './components/mainTrainer/notes/UploadPdf';
 
 import SplashScreen from 'react-native-splash-screen'
+import ListGyms from './components/gyms/ListGyms';
+import GymProfile from './components/gyms/GymProfile';
 
 const Stack = createStackNavigator();
 
@@ -342,6 +344,20 @@ const App = () => {
             <Stack.Screen 
               name="MyGymTrainer"
               component={MyGymTrainer}
+              options={{
+                header: () => null
+              }}
+            />
+            <Stack.Screen 
+              name="ListGyms"
+              component={ListGyms}
+              options={{
+                header: () => null
+              }}
+            />
+            <Stack.Screen 
+              name="GymProfile"
+              component={GymProfile}
               options={{
                 header: () => null
               }}

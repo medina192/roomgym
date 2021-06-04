@@ -4,6 +4,7 @@ import {
   View,
   Text,
   FlatList,
+  ActivityIndicator
 } from 'react-native';
 
 import axios from 'axios';
@@ -78,6 +79,8 @@ const ListUsersScreen = ({navigation}) => {
     }
   }
 
+  console.log('list', listUsers);
+
   return (
     <>
       <View style={styles.containerListTrainers}>
@@ -88,30 +91,47 @@ const ListUsersScreen = ({navigation}) => {
 
             if(usersLoaded)
             {
-              return(
-                <View>
-                  <FlatList
-                    data={listUsers}
-                    renderItem= { (user) => 
-                    {
-                      return( ()=> {
-   
-                        return(
-                          <>      
-                            <CardUser user={user} navigation={navigation}/>
-                          </>
-                        );
-                      })()
-                    }
-                    }
-                    keyExtractor= {(trainer, key) => key.toString()}
-                  />
-                </View>
-                  );
+              if(listUsers.length > 0)
+              {
+                return(
+                  <View>
+                    <FlatList
+                      data={listUsers}
+                      renderItem= { (user) => 
+                      {
+                        return( ()=> {
+     
+                          return(
+                            <>      
+                              <CardUser user={user} navigation={navigation}/>
+                            </>
+                          );
+                        })()
+                      }
+                      }
+                      keyExtractor= {(trainer, key) => key.toString()}
+                    />
+                  </View>
+                    );
+              }
+              else{
+                return(
+                  <View style={styles.containerTextUnsubscibed}>
+                    <Text style={styles.textUnsubscribed}>Aún no tienes usuarios suscritos</Text>
+                  </View>
+                )
+              }
+
                 }
                 else{
                   return(
-                    <Text>There is no trainers</Text>
+                    <View style={styles.containerIndicator}>
+                      <ActivityIndicator
+                        size={80}
+                        color={Colors.MainBlue}
+                        style={styles.activityIndicator}
+                      />
+                    </View>
                   );
                 }
               } )()}
@@ -123,6 +143,14 @@ const ListUsersScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
+
+  containerIndicator:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1
+  },
+
   containerListTrainers:{
     flex: 1,
     width: '100%',
@@ -162,5 +190,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#fff'
+  },
+
+  // unsubscribed
+  containerTextUnsubscibed:{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30
+  },
+  textUnsubscribed:{
+    backgroundColor: "#999",
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+    padding: 10
   },
 });

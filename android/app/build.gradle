@@ -142,7 +142,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.roomgym"
+        applicationId "com.codewaysolutions.roomgymalejandrodiaz"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

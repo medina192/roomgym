@@ -201,42 +201,6 @@ const Login = ({navigation}) => {
       .then(function (response) {
         const userString = JSON.stringify(response.data.resp[0]);
         const userObject = JSON.parse(userString);
-        /*
-          console.log('good, user logged',response.data.resp[0].role);
-          const userString = JSON.stringify(response.data.resp[0]);
-          const userObject = JSON.parse(userString);
-          if(isEnabled)
-          {
-            if(response.data.resp[0].role == '1')
-            {
-              console.log('user');
-
-              dispatch(saveUser(userObject));
-              generateSecureStorage(userString, '1', );
-              //navigation.navigate('MainUserScreen');
-            }
-            else{
-              console.log('trainer');
-
-              dispatch(T_saveTrainer(userObject));
-              generateSecureStorage(userString, '2',);
-              //navigation.navigate('MainTrainerScreen');
-            }
-          }
-          else{
-            if(response.data.resp[0].role == '1')
-            {
-
-              dispatch(saveUser(userObject));
-              navigation.navigate('MainUserScreen');
-            }
-            else{
-
-              dispatch(T_saveTrainer(userObject));
-              navigation.navigate('MainTrainerScreen');
-            }
-          }
-          */
           const auxIdusuario = response.data.resp[0].idusuario;
           axios({
             method: 'get',

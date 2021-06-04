@@ -209,7 +209,6 @@ const UserScreen = ({navigation}) => {
   }
 
 
-
   /// sql litre _______________________________________________________________---
 
   useEffect(() => {
@@ -237,6 +236,9 @@ const UserScreen = ({navigation}) => {
     };
 
     createTable();
+
+
+
   }, [])
 
 
@@ -344,7 +346,18 @@ const UserScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
     
-
+          <View style={styles.containerTextDescriptionButton}>
+            <Text style={styles.textDescriptionButton}>¿Que gimansios me recomiendas?</Text>
+            <Text style={styles.textDescriptionButtonSubtitle}>Revisa los gimansios de tus entrenadores</Text>
+          </View>
+          <View style={styles.containerTouchableImage}>
+            <TouchableOpacity style={styles.touchableContainerImage}
+              onPress={() => changeUserScreen('ListGyms')} >
+              <ImageBackground source={ require('../../assets/img/_6.jpg')} style={styles.imageButton}>
+                <Text style={styles.textImageButton}>Gimnasios</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+          </View>
 
 
           <View style={styles.containerButtonSubscribe}>

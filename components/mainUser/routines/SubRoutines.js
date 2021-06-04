@@ -58,7 +58,7 @@ const SubRoutinesScreen = ({navigation}) => {
   const [routineName, setRoutineName] = useState('');
   const subRoutine = useSelector(state => state.subRoutine);
   const userInformation = useSelector(state => state.user);
-
+  console.log('sub', subRoutine);
   
   const [state, setState] = useState(false);
   const [routines, setRoutines] = useState(subRoutine.routines);
@@ -85,41 +85,7 @@ const SubRoutinesScreen = ({navigation}) => {
 
   
 
-  // begin  dialog error empty fields alert _________________________
 
-  const showDialog = () => setVisible(true);
-
-  const hideDialog = () => setVisible(false);
-
-  // end  dialog error empty fields alert _________________________
-
-
-  
-  // begin  dialog error empty fields alert _________________________
-
-  const showDialogName = () => setNameExists(true);
-
-  const hideDialogName = () => setNameExists(false);
-
-  // end  dialog error empty fields alert _________________________
-
-
-    // begin  dialog error name routine alert _________________________
-
-    const showDialogRoutine = () => setVisibleRoutines(true);
-
-    const hideDialogRoutine = () => setVisibleRoutines(false);
-  
-    // end  dialog error name routine alert _________________________
-
-
-    // begin  dialog error time alert _________________________
-
-    const showDialogTime = () => setVisibleTime(true);
-
-    const hideDialogTime = () => setVisibleTime(false);
-  
-    // end  dialog error time alert _________________________
 
 
 
@@ -215,21 +181,21 @@ const SubRoutinesScreen = ({navigation}) => {
             
           }
           else{
-            showDialogTime();
+
           }
         }
         else{
-          showDialogRoutine();
+
         }
       }
       else{
-        showDialogName();
+
       }
      
     }
     else{
       console.log('there is no routines');
-      showDialog();
+
     }    
   }
   
@@ -262,141 +228,15 @@ const SubRoutinesScreen = ({navigation}) => {
 
 console.log('sub', subRoutine.routines);
   return (
-    <>
+    <View style={{flex: 1, position: 'relative'}}>
       <TopBar navigation={navigation} title={subRoutine.name} returnButton={true} />
 
         <View style={styles.containerScrollView}>
           <ScrollView>
-            <View style={styles.containerInput}>
-              <View style={  styles.containerIconInput }>
-                <TextInput style={styles.inputRegister}
-                  placeholder="Nombre Rutina"
-                  onChangeText={ (text) => setRoutineName(text) }
-                />
-              </View>
-            </View>
 
-            <View>
-
-                {
-                    subRoutine.routines.map((routine, index) => (
-     
-                        <View key={index}>
-                        <View style={styles.containerTouchableImage}>
-                          <TouchableOpacity style={styles.touchableContainerImage}
-                            onPress={() => changeToRoutine(routine)} >
-                              <Text style={styles.textImageButton}>{routine.name}</Text>
-                          </TouchableOpacity>
-                        </View>
-                        <View style={styles.containerCheckBox1}>
-                            <CheckBox
-                                disabled={false}
-                                value={routine.selected}
-                                onValueChange={() => changeCheckbox(routine.selected,index)}
-                            />
-                            {
-                              routine.selected ?
-                              (
-                                <>
-                                  <View style={styles.containerInputs}>
-                                  <View style={styles.containerNumberRoutineInput}>
-                                      <Text style={styles.textNumberRoutine}>Número de repeticiones</Text>
-                                      <TextInput style={styles.inputNumberRoutine}
-                                        placeholder="0"
-                                        keyboardType="numeric"
-                                        onChangeText={ (text) => setValuesInputs(text, index, 'routines') }
-                                      />
-                                    </View>
-                                    <View style={styles.containerInputTime}>
-                                      <Text style={styles.textTime}>Minutos</Text>
-                                      <TextInput style={styles.inputRegister}
-                                        placeholder="0"
-                                        keyboardType="numeric"
-                                        onChangeText={ (text) => setValuesInputs(text, index, 'minutes') }
-                                      />
-                                    </View>
-                                    <View style={styles.containerInputTime}>
-                                      <Text style={styles.textTime}>Segundos</Text>
-                                      <TextInput style={styles.inputRegister}
-                                        placeholder="0"
-                                        keyboardType="numeric"
-                                        onChangeText={ (text) => setValuesInputs(text, index, 'seconds') }
-                                      />
-                                    </View>
-                                  </View>
-                                </>
-                              )
-                              :
-                              (
-                                <>
-                                <Text>hola</Text>
-                                </>
-                              )
-                            }
-                          </View>
-                        </View>
-                      
-                    ))
-                  }
-            </View>
           </ScrollView>
         </View>
 
-        <View>
-            <Portal>
-              <Dialog visible={visible} onDismiss={hideDialog}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>No hay rutinas seleccionadas</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialog}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
-
-        <View>
-            <Portal>
-              <Dialog visible={nameExists} onDismiss={hideDialogName}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>Asigna un nombre a la rutina</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialogName}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
-
-        <View>
-            <Portal>
-              <Dialog visible={visibleRoutines} onDismiss={hideDialogRoutine}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>Debes asignar mínimo una repetición</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialogRoutine}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
-
-        <View>
-            <Portal>
-              <Dialog visible={visibleTime} onDismiss={hideDialogTime}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>Una ejercicio no puede tener tiempo 0</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialogTime}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
 
         <View style={styles.containerSaveButton}>
             <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
@@ -404,7 +244,7 @@ console.log('sub', subRoutine.routines);
             </TouchableOpacity>
         </View>
       <BottomBar navigation={navigation}/>
-    </>
+    </View>
   );
 };
 

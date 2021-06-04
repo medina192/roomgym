@@ -5,6 +5,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 
 import axios from 'axios';
@@ -47,7 +48,8 @@ const CustomPlanScreen = ({navigation}) => {
   const dispatch = useDispatch();
 
   const [routines, setRoutines] = useState([]);
-  const [state, setstate] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [refreshState, setRefreshState] = useState(false);
  
 
   useEffect(() => {
@@ -61,41 +63,17 @@ const CustomPlanScreen = ({navigation}) => {
 
   const getRoutines = async() => {
 
-try {
-  const response = await axios({
-    method: 'get',
-    url: `${serverUrl}/relations/getroutinesbyuser/${user.idusuario}`,
-  });
-
-  getTrainersOfRoutines(response.data.resp);
-} catch (error) {
-  console.log(error);
-}
-
-    /*
-    axios({
-      method: 'get',
-      url: `${serverUrl}/relations/getroutinesbyuser/${user.idusuario}`,
-    })
-    .then(function (response) {
-        
+    try {
+      const response = await axios({
+        method: 'get',
+        url: `${serverUrl}/relations/getroutinesbyuser/${user.idusuario}`,
+      });
+      setLoading(false);
       getTrainersOfRoutines(response.data.resp);
-        
-        //
-        if(response.data.resp.length > 0)
-        {
-          const routinesString = response.data.resp;
-          
-          let r = JSON.parse(response.data.resp[0].rutinas);
-          console.log('ey',r[0]);
-          setRoutines(routinesString);
-        }
-        //
-    })
-    .catch(function (error) {
-        console.log('error get routines  axios',error);
-    });
-    */
+    } catch (error) {
+      console.log(error);
+    }
+
   }
 
 
@@ -115,7 +93,7 @@ try {
 
     }
     setRoutines(routinesResp);
-    setstate(true);
+    setRefreshState(!refreshState);
   }
 
 
@@ -139,12 +117,12 @@ try {
 
 
   return (
-    <>
+    <View style={{flex: 1, position: 'relative'}}>
       <TopBar navigation={navigation} title={`Mi plan personalizado`} returnButton={true} />
       <ScrollView style={{flex: 1}}>
 
        {
-         state ?
+         !loading ?
          (
            <>
             <View style={styles.containerAllRoutines}>
@@ -169,7 +147,7 @@ try {
                 )
                 :
                 (
-                  <Text>Loading</Text>
+                  <Text>No tienes rutinas guardadas aún</Text>
                 )
               }
               </View>
@@ -193,7 +171,7 @@ try {
                 )
                 :
                 (
-                  <Text>Loading</Text>
+                  <Text>No tienes rutinas guardadas aún</Text>
                 )
               }
               </View>
@@ -201,16 +179,30 @@ try {
          )
          :
          (
-           <Text>llol</Text>
+          <View style={styles.containerIndicator}>
+            <ActivityIndicator
+              size={80}
+              color={Colors.MainBlue}
+              style={styles.activityIndicator}
+            />
+          </View>
          )
        }
       </ScrollView>
       <BottomBar/>
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+
+  containerIndicator:{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1
+  },
+
   containerAllRoutines:{
     flex: 1,
     width: '100%',

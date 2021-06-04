@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 
 
@@ -30,6 +31,9 @@ import Colors  from '../../../colors/colors';
 
 import { urlServer } from '../../../services/urlServer';
 
+import AlertComponent from '../../shared/AlertComponent';
+
+import PickerText from '../../shared/Picker';
 
 const Drawer = createDrawerNavigator();
 
@@ -59,12 +63,11 @@ const CreateRoutinesScreen = ({navigation}) => {
   const user = useSelector(state => state.T_user);
 
 
-
+  const [mainIndicator, setMainIndicator] = useState(true);
   const [routinesCreated, setRoutinesCreated] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [showListSavedRoutines, setShowListSavedRoutines] = useState(false);
   const [routinesSaved, setRoutinesSaved] = useState([]);
-
 
 
   const [visible, setVisible] = useState(false);
@@ -74,179 +77,22 @@ const CreateRoutinesScreen = ({navigation}) => {
   const [visibleTime, setVisibleTime] = useState(false);
   const [state, setstate] = useState(false);
 
+  const [showAlert, setShowAlert] = useState({
+    show: false,
+    type: 'error',
+    action: 'close', 
+    message: '', 
+    title: '', 
+    iconAlert: 'times-circle',
+    nextScreen: 'MyGymTrainer'
+  });
+
 
   useEffect(() => {
     getSavedRoutines();
   }, []);
-    // begin  dialog error empty fields alert _________________________
-
-    const showDialog = () => setVisible(true);
-
-    const hideDialog = () => setVisible(false);
-  
-    // end  dialog error empty fields alert _________________________
-  
-  
-      // begin  dialog error name routine alert _________________________
-  
-      const showDialogName = () => setNameExists(true);
-  
-      const hideDialogName = () => setNameExists(false);
-    
-      // end  dialog error name routine alert _________________________
 
 
-          // begin  dialog error name routine alert _________________________
-
-    const showDialogRoutine = () => setVisibleRoutines(true);
-
-    const hideDialogRoutine = () => setVisibleRoutines(false);
-  
-    // end  dialog error name routine alert _________________________
-
-
-    // begin  dialog error name exercise routine alert _________________________
-
-        const showDialogExerciseName = () => setNameExerciseExists(true);
-
-        const hideDialogExerciseName = () => setNameExerciseExists(false);
-            
-    // end  dialog error name exercise routine alert _________________________
-
-
-    // begin  dialog error time alert _________________________
-
-    const showDialogTime = () => setVisibleTime(true);
-
-    const hideDialogTime = () => setVisibleTime(false);
-  
-    // end  dialog error time alert _________________________
-
-
-    
-    /*
-    const setValuesInputs = (text, index, type) => {
-
-      switch (type) {
-        case 'routines':
-          routines[index].repetitions = text; 
-          setRoutines(routines);
-          setState(!state);
-          break;
-        case 'minutes':
-          routines[index].time_minutes = text; 
-          setRoutines(routines);
-          setState(!state);
-          break;
-        case 'seconds':
-          routines[index].time_seconds = text; 
-          setRoutines(routines);
-          setState(!state);
-          break;
-      
-        default:
-          break;
-      }
-    }-----------------------------------------------------------------
-*/
-    /*
-
-  const saveRoutine = () => {
-    
-    let verifyRoutinesExists = false;
-    for(let i = 0; i< routines.length; i++)
-    {
-      if(routines[i].selected)
-      {
-        verifyRoutinesExists = true;
-        break;
-      }
-    }
-
-
-    if(verifyRoutinesExists)
-    {
-      if(routineName)
-      {
-        let routinesSelected = [];
-        for(let i = 0; i< routines.length; i++)
-        {
-          if(routines[i].selected)
-          {
-            routinesSelected.push(routines[i]);
-          }
-        }
-
-        let auxRoutinesRepetitions = true;
-        let auxTimeRoutines = true;
-        for(let i = 0; i < routinesSelected.length; i++)
-        {
-          if(routinesSelected[i].repetitions == '0' || routinesSelected[i].repetitions == '' )
-          {
-            auxRoutinesRepetitions = false;
-            break;
-          }
-          console.log(routinesSelected[i].time_minutes);
-          console.log(routinesSelected[i].time_seconds);
-          if((routinesSelected[i].time_minutes == '0' && routinesSelected[i].time_seconds == '0')
-           || routinesSelected[i].time_minutes == '' || routinesSelected[i].time_seconds == '')
-          {
-           
-            auxTimeRoutines = false;
-            break;
-          }
-        }
-
-        if(auxRoutinesRepetitions)
-        {
-
-          if(auxTimeRoutines)
-          {
-           
-            const routinesString = JSON.stringify(routinesSelected);
-        
-            const auxObject = {
-              ejercicios: routinesString,
-              idUsuario: user.idUsuario,
-              tipo: subRoutine.name,
-              nombre: routineName,
-              id_relacion_entrenador_usuario: user.id_relacion_entrenador_usuario
-            };
-            
-            
-            axios({
-              method: 'post',
-              url: `${serverUrl}/relations/saveroutinebytrainer`,
-              data: auxObject
-            })
-            .then(function (response) {
-                console.log('routine',response.data.resp);
-                clearCheckBoxes();
-                navigation.navigate('ListUsers');
-            })
-            .catch(function (error) {
-                //console.log('error axios',error);
-            });
-            
-          }
-          else{
-            showDialogTime();
-          }
-        }
-        else{
-          showDialogRoutine();
-        }
-  
-      }
-      else{
-        showDialogName();
-      }
-    }
-    else{
-      showDialog();
-    }
-  }
-*/
 
   const addNewRoutine = () => {
     const template = {
@@ -273,40 +119,8 @@ const CreateRoutinesScreen = ({navigation}) => {
   }
 
 
-  /*
-  const saveRoutineDatabase = (routineObject, index) => {
-
-    const routinesString = JSON.stringify(routineObject);
-
-    const auxObject = {
-      ejercicios: routinesString,
-      idUsuario: user.idUsuario,
-      id_relacion_entrenador_usuario: user.id_relacion_entrenador_usuario,
-      tipo: routineObject[0].tipo,
-      nombre: routineObject[0].name
-    };                  
-
-    axios({
-      method: 'post',
-      url: `${serverUrl}/relations/saveroutinebytrainer`,
-      data: auxObject
-    })
-    .then(function (response) {
-        //console.log('routine',response.data.resp.insertId);
-        getSavedRoutines();
-        routineObject[index].state = 1;
-        routineObject[index].idRutinas = response.data.resp.insertId;
-        setRoutinesCreated(routineObject);
-        setstate(!state);
-    })
-    .catch(function (error) {
-        console.log('error axios',error);
-    });
-    
-  }
-*/
-
   const saveRoutine = (index) => {
+
 
     if(routinesCreated[index].name != '')
     {
@@ -330,42 +144,92 @@ const CreateRoutinesScreen = ({navigation}) => {
                   
                 }
                 else{
-                  showDialogTime();
+                  setShowAlert({
+                    show: true,
+                    type: 'error',
+                    action: 'close', 
+                    message: 'Un ejercicio no puede tener tiempo cero', 
+                    title: 'Tiempo cero', 
+                    iconAlert: 'close',
+                    nextScreen: 'MyGymTrainer'
+                  });
                   return;
                 }
               }
               else{
-                showDialogTime();
+                setShowAlert({
+                  show: true,
+                  type: 'error',
+                  action: 'close', 
+                  message: 'Asigna un tiempo en los campos correspondientes', 
+                  title: 'Campos del tiempo vacíos', 
+                  iconAlert: 'close',
+                  nextScreen: 'MyGymTrainer'
+                });
                 return;
               }
             }
             else{
-              showDialogRoutine();
+              setShowAlert({
+                show: true,
+                type: 'error',
+                action: 'close', 
+                message: 'Debes asignar al menos una repetición', 
+                title: 'No asignaste repeticiones', 
+                iconAlert: 'close',
+                nextScreen: 'MyGymTrainer'
+              });
               return;
             }
           }
           else{
-            showDialogExerciseName();
+            setShowAlert({
+              show: true,
+              type: 'error',
+              action: 'close', 
+              message: 'Debes asignar un nombre al ejercicio', 
+              title: 'El ejercicio no tiene nombre', 
+              iconAlert: 'close',
+              nextScreen: 'MyGymTrainer'
+            });
             return;
           }
         }
       }
       else{
-        showDialog();
+        setShowAlert({
+          show: true,
+          type: 'error',
+          action: 'close', 
+          message: 'Debes crear al menos un ejercicio', 
+          title: 'No hay ejercicios', 
+          iconAlert: 'close',
+          nextScreen: 'MyGymTrainer'
+        });
         return;
       }
     }
     else{
-      showDialogName();
+      setShowAlert({
+        show: true,
+        type: 'error',
+        action: 'close', 
+        message: 'Debes asignar un nombre a la rutina', 
+        title: 'La rutina no tiene nombre', 
+        iconAlert: 'wifi',
+        nextScreen: 'MyGymTrainer'
+      });
       return;
     }
-    console.log('rty', routinesCreated[index]);
+    //console.log('rty', routinesCreated[index]);
     if(routinesCreated[index].tipo == '') routinesCreated[index].tipo = 'brazo';
     saveRoutineDatabase(routinesCreated, index);
   }
 
 
   const saveRoutineDatabase = (routineObject, index) => {
+
+    setMainIndicator(true);
 
     const routinesString = JSON.stringify(routineObject[index].exercises);
 
@@ -377,6 +241,7 @@ const CreateRoutinesScreen = ({navigation}) => {
       nombre: routineObject[index].name
     };                  
 
+
     axios({
       method: 'post',
       url: `${serverUrl}/relations/saveroutinebytrainer`,
@@ -384,6 +249,17 @@ const CreateRoutinesScreen = ({navigation}) => {
     })
     .then(function (response) {
         //console.log('routine',response.data.resp.insertId);
+        setMainIndicator(false);
+        setShowAlert({
+          show: true,
+          type: 'good',
+          action: 'close', 
+          message: 'La rutina fue guardada satisfactoriamente', 
+          title: 'Rutina guardada con éxito', 
+          iconAlert: 'save',
+          nextScreen: 'MyGymTrainer'
+        });
+
         getSavedRoutines();
         routineObject[index].state = 1;
         routineObject[index].idRutinas = response.data.resp.insertId;
@@ -391,8 +267,22 @@ const CreateRoutinesScreen = ({navigation}) => {
         setstate(!state);
     })
     .catch(function (error) {
-        console.log('error axios',error);
-    });
+        //console.log('error axios',error);
+        setMainIndicator(false);
+        if(error.request._response.slice(0,17) === 'Failed to connect')
+        {
+
+          setShowAlert({
+            show: true,
+            type: 'error',
+            action: 'close', 
+            message: 'Verifica tu conexión a internet o notifica al equipo de GymRoom sobre el problema', 
+            title: 'No se pudo conectar con el servidor', 
+            iconAlert: 'wifi',
+            nextScreen: 'MyGymTrainer'
+          });
+        }
+      });
     
   }
   const editRoutine = (index) => {
@@ -447,6 +337,7 @@ const CreateRoutinesScreen = ({navigation}) => {
       setstate(!state);
   }
 
+
   const addNewExercise = (index) => {
 
     const exercise = {
@@ -457,7 +348,6 @@ const CreateRoutinesScreen = ({navigation}) => {
       time_seconds: ''
     }
     const lengthExercises = routinesCreated[index].exercises.length;
-
     
     if(lengthExercises > 0)
     {
@@ -466,10 +356,10 @@ const CreateRoutinesScreen = ({navigation}) => {
     else{
       routinesCreated[index].exercises[0] = exercise;
     }
-
     setRoutinesCreated(routinesCreated);
     setstate(!state);
   }
+
 
 
   const disscardExercise = (index, indexExercise) => {
@@ -503,14 +393,29 @@ const CreateRoutinesScreen = ({navigation}) => {
       url: `${serverUrl}/relations/getroutinesbytrainer/${user.idEntrenador}`,
     })
     .then(function (response) {
-        //console.log('saved',response.data.routines);
- 
-        setRoutinesSaved(response.data.routines);
+        console.log('saved',response.data);
+        setMainIndicator(false);
+        //setRoutinesSaved(response.data.routines);
     })
     .catch(function (error) {
         //console.log('error axios',error);
+        setMainIndicator(false);
+        if(error.request._response.slice(0,17) === 'Failed to connect')
+        {
+          setShowAlert({
+            show: true,
+            type: 'error',
+            action: 'close', 
+            message: 'Si ya tienes rutinas guardadas, no las podras usar', 
+            title: 'Sin conexión a internet', 
+            iconAlert: 'wifi',
+            nextScreen: 'MyGymTrainer'
+          });
+        }
     });
   }
+
+
 
 
   const addSavedRoutine = (item) => {
@@ -535,9 +440,9 @@ const CreateRoutinesScreen = ({navigation}) => {
   }
 
 
-  console.log('rou', routinesCreated);
+
   const updateRoutine = (index) => {
-    console.log('update', routinesCreated[index]);
+    //console.log('update', routinesCreated[index]);
 
     if(routinesCreated[index].name != '')
     {
@@ -561,33 +466,81 @@ const CreateRoutinesScreen = ({navigation}) => {
                   
                 }
                 else{
-                  showDialogTime();
+                  setShowAlert({
+                    show: true,
+                    type: 'error',
+                    action: 'close', 
+                    message: 'Un ejercicio no puede tener tiempo cero', 
+                    title: 'Tiempo cero', 
+                    iconAlert: 'close',
+                    nextScreen: 'MyGymTrainer'
+                  });
                   return;
                 }
               }
               else{
-                showDialogTime();
+                setShowAlert({
+                  show: true,
+                  type: 'error',
+                  action: 'close', 
+                  message: 'Asigna un tiempo en los campos correspondientes', 
+                  title: 'Campos del tiempo vacíos', 
+                  iconAlert: 'close',
+                  nextScreen: 'MyGymTrainer'
+                });
                 return;
               }
             }
             else{
-              showDialogRoutine();
+              setShowAlert({
+                show: true,
+                type: 'error',
+                action: 'close', 
+                message: 'Debes asignar al menos una repetición', 
+                title: 'No asignaste repeticiones', 
+                iconAlert: 'close',
+                nextScreen: 'MyGymTrainer'
+              });
               return;
             }
           }
           else{
-            showDialogExerciseName();
+            setShowAlert({
+              show: true,
+              type: 'error',
+              action: 'close', 
+              message: 'Debes asignar un nombre al ejercicio', 
+              title: 'El ejercicio no tiene nombre', 
+              iconAlert: 'close',
+              nextScreen: 'MyGymTrainer'
+            });
             return;
           }
         }
       }
       else{
-        showDialog();
+        setShowAlert({
+          show: true,
+          type: 'error',
+          action: 'close', 
+          message: 'Debes crear al menos un ejercicio', 
+          title: 'No hay ejercicios', 
+          iconAlert: 'close',
+          nextScreen: 'MyGymTrainer'
+        });
         return;
       }
     }
     else{
-      showDialogName();
+      setShowAlert({
+        show: true,
+        type: 'error',
+        action: 'close', 
+        message: 'Debes asignar un nombre a la rutina', 
+        title: 'La rutina no tiene nombre', 
+        iconAlert: 'close',
+        nextScreen: 'MyGymTrainer'
+      });
       return;
     }
 
@@ -605,7 +558,7 @@ const CreateRoutinesScreen = ({navigation}) => {
       nombre: routinesCreated[index].name
     };        
     
-    console.log('auxxx', auxObject);
+    setMainIndicator(true);
 
     axios({
       method: 'put',
@@ -613,7 +566,17 @@ const CreateRoutinesScreen = ({navigation}) => {
       data: auxObject
     })
     .then(function (response) {
-        console.log('routine',response.data.resp);
+        //console.log('routine',response.data.resp);
+        setMainIndicator(false);
+        setShowAlert({
+          show: true,
+          type: 'good',
+          action: 'close', 
+          message: 'La rutina fue actualizada satisfactoriamente', 
+          title: 'Rutina actualizada con éxito', 
+          iconAlert: 'save',
+          nextScreen: 'MyGymTrainer'
+        });
         getSavedRoutines();
         const exercisesObject = JSON.parse(auxObject.ejercicios);
         routinesCreated[index].state = 1;
@@ -622,7 +585,20 @@ const CreateRoutinesScreen = ({navigation}) => {
         setstate(!state);
     })
     .catch(function (error) {
-        console.log('error axios',error);
+        //console.log('error axios',error);
+        setMainIndicator(false);
+        if(error.request._response.slice(0,17) === 'Failed to connect')
+        {
+          setShowAlert({
+            show: true,
+            type: 'error',
+            action: 'close', 
+            message: 'Si ya tienes rutinas guardadas, no las podras usar', 
+            title: 'Sin conexión a internet', 
+            iconAlert: 'wifi',
+            nextScreen: 'MyGymTrainer'
+          });
+        }
     });
 
   }
@@ -657,6 +633,8 @@ const CreateRoutinesScreen = ({navigation}) => {
     setstate(!state);
     
   }
+
+  const categories = ['Brazo', 'Pierna', 'Espalda', 'Pecho', 'Hombro'];
   
   return (
     <View style={styles.mainContainer}>
@@ -713,7 +691,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                           <TextInput style={styles.inputNameRoutine}
                             placeholder="Nombre Rutina"
                             defaultValue={routine.name}
-                            placeholderTextColor={Colors.MainBlue}
+                            placeholderTextColor='#999'
                             onChangeText={ (text) => setValuesInputsRoutine(text, index, 'routine', 'name') }
                           />
                           <Text style={styles.textTypePicker}>Tipo</Text>
@@ -724,12 +702,11 @@ const CreateRoutinesScreen = ({navigation}) => {
                                             onValueChange={(itemValue, itemIndex) =>
                                               addTypeNewRoutine(itemValue, index)
                                             }>
-                                            <Picker.Item label="Brazo" value="brazo" />
-                                            <Picker.Item label="Pierna" value="pierna" />
-                                            <Picker.Item label="Espalda" value="espalda" />
-                                            <Picker.Item label="Pecho" value="pecho" />
-                                            <Picker.Item label="Glúteo" value="gluteo" />
-                                            <Picker.Item label="Hombro" value="hombro" />
+                                            <Picker.Item label="Brazo" value="Brazo" />
+                                            <Picker.Item label="Pierna" value="Pierna" />
+                                            <Picker.Item label="Espalda" value="Espalda" />
+                                            <Picker.Item label="Pecho" value="Pecho" />
+                                            <Picker.Item label="Hombro" value="Hombro" />
                                           </Picker>
                                         </View>
                             {
@@ -754,7 +731,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                             <TextInput style={styles.inputNameExercise}
                                               placeholder="Nombre Ejercicio"
                                               defaultValue={exercise.name}
-                                              placeholderTextColor={Colors.MainBlue}
+                                              placeholderTextColor='#999'
                                               onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'name')}
                                             />
                                         </View>
@@ -774,7 +751,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                               placeholder="0"
                                               defaultValue={exercise.repetitions}
                                               keyboardType="numeric"
-                                              placeholderTextColor={Colors.MainBlue}
+                                              placeholderTextColor='#999'
                                               onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'repetitions') }
                                             />
                                           </View>
@@ -784,7 +761,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                               <TextInput style={styles.inputTimeExercise}
                                                 placeholder="0"
                                                 keyboardType="numeric"
-                                                placeholderTextColor={Colors.MainBlue}
+                                                placeholderTextColor='#999'
                                                 defaultValue={exercise.time_minutes}
                                                 onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'minutes') }
                                               />
@@ -794,7 +771,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                               <TextInput style={styles.inputTimeExercise}
                                                 placeholder="0"
                                                 keyboardType="numeric"
-                                                placeholderTextColor={Colors.MainBlue}
+                                                placeholderTextColor='#999'
                                                 defaultValue={exercise.time_seconds}
                                                 onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise','seconds') }
                                               />
@@ -850,7 +827,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                           <TextInput style={styles.inputNameRoutine}
                             placeholder="Nombre Rutina"
                             defaultValue={routine.name}
-                            placeholderTextColor={Colors.MainBlue}
+                            placeholderTextColor='#999'
                             onChangeText={ (text) => setValuesInputsRoutine(text, index, 'routine', 'name') }
                           />
                           <Text style={styles.textTypePicker}>Tipo</Text>
@@ -861,12 +838,11 @@ const CreateRoutinesScreen = ({navigation}) => {
                                             onValueChange={(itemValue, itemIndex) =>
                                               addTypeNewRoutine(itemValue, index)
                                             }>
-                                            <Picker.Item label="Brazo" value="brazo" />
-                                            <Picker.Item label="Pierna" value="pierna" />
-                                            <Picker.Item label="Espalda" value="espalda" />
-                                            <Picker.Item label="Pecho" value="pecho" />
-                                            <Picker.Item label="Glúteo" value="gluteo" />
-                                            <Picker.Item label="Hombro" value="hombro" />
+                                            <Picker.Item label="Brazo" value="Brazo" />
+                                            <Picker.Item label="Pierna" value="Pierna" />
+                                            <Picker.Item label="Espalda" value="Espalda" />
+                                            <Picker.Item label="Pecho" value="Pecho" />
+                                            <Picker.Item label="Hombro" value="Hombro" />
                                           </Picker>
                                         </View>
                             {
@@ -891,7 +867,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                             <TextInput style={styles.inputNameExercise}
                                               placeholder="Nombre Ejercicio"
                                               defaultValue={exercise.name}
-                                              placeholderTextColor={Colors.MainBlue}
+                                              placeholderTextColor='#999'
                                               onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'name')}
                                             />
                                         </View>
@@ -912,7 +888,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                               placeholder="0"
                                               defaultValue={exercise.repetitions}
                                               keyboardType="numeric"
-                                              placeholderTextColor={Colors.MainBlue}
+                                              placeholderTextColor='#999'
                                               onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'repetitions') }
                                             />
                                           </View>
@@ -923,7 +899,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                                 placeholder="0"
                                                 keyboardType="numeric"
                                                 defaultValue={exercise.time_minutes}
-                                                placeholderTextColor={Colors.MainBlue}
+                                                placeholderTextColor='#999'
                                                 onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'minutes') }
                                               />
                                             </View>
@@ -932,7 +908,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                               <TextInput style={styles.inputTimeExercise}
                                                 placeholder="0"
                                                 keyboardType="numeric"
-                                                placeholderTextColor={Colors.MainBlue}
+                                                placeholderTextColor='#999'
                                                 defaultValue={exercise.time_seconds}
                                                 onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise','seconds') }
                                               />
@@ -986,7 +962,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                         <View key={index} style={styles.cardRoutine}>
                           <TextInput style={styles.inputNameRoutine}
                             placeholder="Nombre Rutina"
-                            placeholderTextColor={Colors.MainBlue}
+                            placeholderTextColor='#999'
                             onChangeText={ (text) => setValuesInputsRoutine(text, index, 'routine', 'name') }
                           />
                           <Text style={styles.textTypePicker}>Tipo</Text>
@@ -997,12 +973,11 @@ const CreateRoutinesScreen = ({navigation}) => {
                               onValueChange={(itemValue, itemIndex) =>
                                 addTypeNewRoutine(itemValue, index)
                               }>
-                              <Picker.Item label="Brazo" value="brazo" />
-                              <Picker.Item label="Pierna" value="pierna" />
-                              <Picker.Item label="Espalda" value="espalda" />
-                              <Picker.Item label="Pecho" value="pecho" />
-                              <Picker.Item label="Glúteo" value="gluteo" />
-                              <Picker.Item label="Hombro" value="hombro" />
+                              <Picker.Item label="Brazo" value="Brazo" />
+                              <Picker.Item label="Pierna" value="Pierna" />
+                              <Picker.Item label="Espalda" value="Espalda" />
+                              <Picker.Item label="Pecho" value="Pecho" />
+                              <Picker.Item label="Hombro" value="Hombro" />
                             </Picker>
                           </View>
                           {
@@ -1025,14 +1000,14 @@ const CreateRoutinesScreen = ({navigation}) => {
                                 <View>
                                     <TextInput style={styles.inputNameExercise}
                                       placeholder="Nombre Ejercicio"
-                                      placeholderTextColor={Colors.MainBlue}
+                                      placeholderTextColor='#999'
                                       onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'name')}
                                     />
                                 </View>
                                 <View>
                                     <TextInput style={styles.inputNameExercise}
                                       placeholder="Descripción Ejercicio"
-                                      placeholderTextColor={Colors.MainBlue}
+                                      placeholderTextColor='#999'
                                       onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'description')}
                                     />
                                 </View>
@@ -1043,7 +1018,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                     <TextInput style={styles.inputRepetitionsExercise}
                                       placeholder="0"
                                       keyboardType="numeric"
-                                      placeholderTextColor={Colors.MainBlue}
+                                      placeholderTextColor='#999'
                                       onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'repetitions') }
                                     />
                                   </View>
@@ -1053,7 +1028,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                       <TextInput style={styles.inputTimeExercise}
                                         placeholder="0"
                                         keyboardType="numeric"
-                                        placeholderTextColor={Colors.MainBlue}
+                                        placeholderTextColor='#999'
                                         onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise', 'minutes') }
                                       />
                                     </View>
@@ -1062,7 +1037,7 @@ const CreateRoutinesScreen = ({navigation}) => {
                                       <TextInput style={styles.inputTimeExercise}
                                         placeholder="0"
                                         keyboardType="numeric"
-                                        placeholderTextColor={Colors.MainBlue}
+                                        placeholderTextColor='#999'
                                         onChangeText={ (text) => setValuesInputsExercise(text, index, indexExercise, 'exercise','seconds') }
                                       />
                                     </View>
@@ -1110,103 +1085,8 @@ const CreateRoutinesScreen = ({navigation}) => {
               }
             </View>
           </ScrollView>
-              {
-                /*
-                          <View style={styles.containerAbsolute}>
-              <FlatList 
-                 data={items}
-                 initialScrollIndex={5}
-                 viewabilityConfig={{
-                  itemVisiblePercentThreshold: 50
-                }}
-                 //horizontal={true}
-                 viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-                 renderItem={({ item, index, separators }) => (
-                   <TouchableOpacity>
-                     <View style={{ backgroundColor: '#fff', width: 30 }}>
-                       <Text style={{fontSize: 20}}>{item.value}</Text>
-                     </View>
-                   </TouchableOpacity>)}
-              />
-          </View>
-                */
-              }
+
         </View>
-
-
-    
-        <View>
-            <Portal>
-              <Dialog visible={visible} onDismiss={hideDialog}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>No hay ejercicios Asignadas</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialog}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
-
-        <View>
-            <Portal>
-              <Dialog visible={nameExists} onDismiss={hideDialogName}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>Asigna un nombre a la rutina</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialogName}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
-
-
-        <View>
-            <Portal>
-              <Dialog visible={nameExerciseExists} onDismiss={hideDialogExerciseName}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>Asigna un nombre al el ejercicio</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialogExerciseName}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
-
-
-        <View>
-            <Portal>
-              <Dialog visible={visibleRoutines} onDismiss={hideDialogRoutine}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>Debes asignar mínimo una repetición</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialogRoutine}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
-
-        <View>
-            <Portal>
-              <Dialog visible={visibleTime} onDismiss={hideDialogTime}>
-                <Dialog.Title>Error</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph>Una ejercicio no puede tener tiempo 0</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>                    
-                  <Button onPress={hideDialogTime}>Cerrar</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
-        </View>
-    
 
         <View style={styles.containerFloatingButtons}>
           <View style={styles.containerCenterFloatingButtons}>
@@ -1226,16 +1106,6 @@ const CreateRoutinesScreen = ({navigation}) => {
           </View>
         </View>
 
-
-        {
-          /*
-                  <View style={styles.containerSaveButton}>
-            <TouchableOpacity style={styles.saveButton} >
-              <Text style={styles.textSaveButton}>Guardar Rutina</Text>
-            </TouchableOpacity>
-        </View>
-          */
-        }
       <BottomBar navigation={navigation}/>
       {
         (() => {
@@ -1281,7 +1151,8 @@ const CreateRoutinesScreen = ({navigation}) => {
                 return(
                   <View style={styles.containerAbsolute}>
                     <View style={styles.containerSavedRoutines}>
-                        <Text>No tienes rutinas guardadas</Text>
+                        <Text style={styles.textWithoutRoutines}>No tienes rutinas guardadas, regresa y crea una</Text>
+                        <Icon name="frown-o" size={40} style={styles.iconLink} color="#999" />
                         <View>
                           <TouchableOpacity style={styles.returnButton}
                             onPress={returnButton}>
@@ -1312,11 +1183,76 @@ const CreateRoutinesScreen = ({navigation}) => {
           }*/
         })()
       }
+        {
+                    mainIndicator ? 
+                    (
+                      <View style={styles.grayContainer}>
+                        <View style={styles.containerIndicator}>
+                          <ActivityIndicator
+                            size={80}
+                            color={Colors.MainBlue}
+                            style={styles.activityIndicator}
+                          />
+                        </View>
+                      </View>
+                    )
+                    :
+                    (
+                      <>
+                      </>
+                    )
+                  }
+                  {
+                    showAlert.show ? 
+                    (
+                      <AlertComponent 
+                        navigation={navigation} 
+                        type={showAlert.type}  
+                        action={showAlert.action} 
+                        message={showAlert.message} 
+                        title={showAlert.title} 
+                        iconAlert={showAlert.iconAlert}
+                        closeFunction={setShowAlert}
+                        stateVariable={showAlert}
+                        nextScreen={showAlert.nextScreen}
+                      />
+                    )
+                    :
+                    (
+                      <>
+                      </>
+                    )
+                  }
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+
+  grayContainer:{
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#00000099',
+    elevation: 40
+  },
+    containerIndicator:{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'absolute',
+      backgroundColor: '#fff',
+      width: '70%',
+      height: '50%',
+      top: '25%',
+      left: '15%',
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
+      elevation: 40
+    },
+
   mainContainer:{
     position: 'relative',
     flex: 1,
@@ -1434,6 +1370,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '60%',
       },
+      textWithoutRoutines:{
+        fontSize: 16,
+        color: '#999',
+        marginBottom: 10
+      },
       returnButton:{
         display: 'flex',
         justifyContent: 'center',
@@ -1445,7 +1386,7 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 50,
         width: 40,
         height: 40,
-        marginTop: 10
+        marginTop: 20
       },
       iconReturn:{
         color: '#fff'
@@ -1622,7 +1563,7 @@ const styles = StyleSheet.create({
       },
 
       textAuxMessage:{
-        backgroundColor: Colors.MainBlue,
+        backgroundColor: "#999",
         color: '#fff',
         fontSize: 20,
         fontWeight: '700',
@@ -1721,23 +1662,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 25,
         marginBottom: 10
       },
-      touchableContainerImage:{
-        height: '100%',
-        width: '100%',
-        backgroundColor: '#123456',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-        overflow: 'hidden', 
-      },
-      textImageButton:{
-        color: "white",
-        fontSize: 30,
-        fontWeight: "bold",
-        textAlign: "center",
-        backgroundColor: "#244EABa0"
-      },  
+
 
       containerInput:{
         display: 'flex',
@@ -1799,43 +1724,6 @@ const styles = StyleSheet.create({
       fontSize: 16
     },  
 
- 
-      containerCheckbox:{
-        marginTop: 10,
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#000'
-      },
-
-      imageButton: {
-        flex: 1,
-        resizeMode: "cover",
-        justifyContent: "center"
-      },
-      textImageButton:{
-        color: "white",
-        fontSize: 30,
-        fontWeight: "bold",
-        textAlign: "center",
-        backgroundColor: "#244EABa0"
-      },  
-      containerTextDescriptionButton:{
-        paddingHorizontal: 10,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems:'center'
-      },
-      textDescriptionButton:{
-        fontSize: 20,
-        textAlign: 'center',
-        fontWeight: '700'
-      },
-      textDescriptionButtonSubtitle:{
-        fontSize: 14,
-        marginTop: 5
-      },
 
       // save button
       containerSaveButton:{

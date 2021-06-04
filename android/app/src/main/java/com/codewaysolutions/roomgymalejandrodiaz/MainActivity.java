@@ -1,4 +1,4 @@
-package com.roomgym;
+package com.codewaysolutions.roomgymalejandrodiaz;
 
 import android.os.Bundle; // here
 
