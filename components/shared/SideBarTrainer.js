@@ -44,10 +44,6 @@ const SideBarTrainer = ({navigation}) => {
                 </View>
             </View>
             <View style={styles.containerLinks}>
-                <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('Routines')}>
-                    <Icon name="envelope" size={24} style={styles.iconLink} color="#fff" />
-                    <Text style={styles.textLink}>Mensajes</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('ListUsers')}>
                     <Icon name="group" size={24} style={styles.iconLink} color="#fff" />
                     <Text style={styles.textLink}>Usuarios</Text>
@@ -55,10 +51,6 @@ const SideBarTrainer = ({navigation}) => {
                 <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('MainTrainerScreen')}>
                     <Icon name="user-o" size={24} style={styles.iconLink} color="#fff" />
                     <Text style={styles.textLink}>Mi perfil</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('CustomPlan')}>
-                    <Icon name="bar-chart-o" size={24} style={styles.iconLink} color="#fff" />
-                    <Text style={styles.textLink}>Estadísticas</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.containerLine}>

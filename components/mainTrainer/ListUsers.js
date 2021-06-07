@@ -55,7 +55,6 @@ const ListUsersScreen = ({navigation}) => {
 
   const ListMyUsers = async() => {
     try {
-      console.log('users');
       const res = await axios({method: 'get',url: `${serverUrl}/relations/getmyusers/${trainerInformation.email}`});
       console.log('users2', res);
       //console.log(res.data.resp);
@@ -75,11 +74,13 @@ const ListUsersScreen = ({navigation}) => {
       setTrainersLoaded(true);
       */
     } catch (error) {
-      console.log(error);        
+      console.log(error);   
+      console.log('loaded', usersLoaded);
+      setUsersLoaded(true);     
     }
   }
 
-  console.log('list', listUsers);
+ 
 
   return (
     <>

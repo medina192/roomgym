@@ -382,7 +382,7 @@ const Register = ({navigation}) => {
 const sendForm = () => {
 
     setMainIndicator(true);
-
+  console.log('passwird', form.password);
     if(form.nombres && form.apellidos && form.email && form.password && form.confirmPassword
       && form.fecha_de_nacimiento){
       
@@ -521,7 +521,7 @@ const sendForm = () => {
     <>  
 
               <TouchableWithoutFeedback onPress={hideKeyBoard}>
-              <ScrollView>
+              <ScrollView style={{flex:1, backgroundColor: '#fff'}}>
                 <View style={styles.containerInputs} >
                   <Icon style={styles.mainIcon} name="user-circle" size={50} color="#fff" />
                   <View style={  styles.containerIconInput }>

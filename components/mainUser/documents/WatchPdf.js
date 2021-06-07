@@ -63,7 +63,7 @@ const WatchPdf = ({navigation, route}) => {
   //const source = {uri:'https://www.ti.com/lit/ds/symlink/lm555.pdf',cache:true};
 
 
-  const urlInServer = `http://192.168.0.9:3002/pdfs/${route.params.document.nombreDocumento}`;
+  const urlInServer = `${serverUrl}/pdfs/${route.params.document.nombreDocumento}`;
 
 
     const downloadPdf = () => {

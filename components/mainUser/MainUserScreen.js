@@ -58,29 +58,31 @@ const UserScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
+  const user = useSelector(state => state.user)
+
 
 
   const [stopImageSlider, setStopImageSlider] = useState(false);
 
   useEffect(() => {
-    /*
+    
       const unsubscribe = messaging().onMessage(async remoteMessage => {
           Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
       });
 
       messaging()
-      .subscribeToTopic('juanortiz')
-      .then(() => console.log(' subscribe to juan ortiz'));
+      .subscribeToTopic('usuario')
+      .then(() => console.log(' subscribe to usuario'))
+      .catch(error => console.log('error subscribed', error));
 
       const background = messaging().setBackgroundMessageHandler(async remoteMessage => {
         console.log('notification background', JSON.stringify(remoteMessage))
       });
-*/
-      return () => {
-  //      unsubscribe();
+
+      return (unsubscribe,background) => {
+        unsubscribe();
         //topicSubscriber();
-    //    background();
-        console.log('return user');
+        background();
         setStopImageSlider(true);
         dispatch(changeState(!state));
       }
@@ -286,7 +288,7 @@ const UserScreen = ({navigation}) => {
 
   return (
     <>
-        <TopBar navigation={navigation} title={`Bienvenido Usuario`} returnButton={false} />
+        <TopBar navigation={navigation} title={`Hola ${user.nombres}`} returnButton={false} />
         <ScrollView style={styles.containerScrollView}>
           {
             /*
@@ -359,86 +361,6 @@ const UserScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
 
-
-          <View style={styles.containerButtonSubscribe}>
-            <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('MainTrainerScreen')}>
-              <Text style={styles.textButoonSubscribe}>Pantalla Entrenador</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('Registro')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Registro</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('Login')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Login</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ openMenu}>
-            <Text style={styles.textButoonSubscribe}>drawer</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ pickDocument}>
-            <Text style={styles.textButoonSubscribe}>open document</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ readPdf}>
-            <Text style={styles.textButoonSubscribe}>read document</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ insertData }>
-            <Text style={styles.textButoonSubscribe}>Inser data sql lite</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ getData }>
-            <Text style={styles.textButoonSubscribe}>get data sql lite</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Image width={100} height={50} source={{uri: 'content://com.android.providers.downloads.documents/document/1247',
-                            width: 300, 
-                            height: 300}} />
-
-<View 
-        
-        style={{
-            flex:1,
-            width:Dimensions.get('window').width,
-            height:Dimensions.get('window').height,
-        }}>
-        <Pdf
-            source={source}
-            onLoadComplete={(numberOfPages,filePath)=>{
-                console.log(`number of pages: ${numberOfPages}`);
-            }}
-            onPageChanged={(page,numberOfPages)=>{
-                console.log(`current page: ${page}`);
-            }}
-            onError={(error)=>{
-                console.log(error);
-            }}
-            onPressLink={(uri)=>{
-                console.log(`Link presse: ${uri}`)
-            }}
-            style={{
-            flex:1,
-            width:Dimensions.get('window').width,
-            height:Dimensions.get('window').height,
-            }}/>
-        </View>
 
         </ScrollView>
 

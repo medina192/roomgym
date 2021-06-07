@@ -964,19 +964,22 @@ const StatisticsScreen = ({navigation}) => {
                                   absolute
                               />
                             </View>
-                            <CalendarPicker
+                            {
+                              /*
+                                                       <CalendarPicker
                               weekdays={weekdays}
                               months={months}
                               startFromMonday={true}
                               customDatesStyles={customDatesStyles}
                               onDateChange={date => onDateChange(date)}
                             />
-                          </View>
+
+                                                      </View>
                           <View>
                             <Text>SELECTED DATE:{ startDate }</Text>
                           </View>
 
-                          <BarChart
+                                                    <BarChart
                               style={{padding: 10, marginRight: 20}}
                               data={dataBar}
                               width={screenWidth - 30}
@@ -991,6 +994,9 @@ const StatisticsScreen = ({navigation}) => {
                               center={[5, 50]}
                               withInnerLines={false}
                           />
+                              */
+                            }
+                          </View>
                         </>
                     )
                     :

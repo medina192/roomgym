@@ -31,7 +31,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import axios from 'axios';
 
-import { urlServer } from '../../../services/urlServer';
+import { urlServer } from '../../services/urlServer';
 
 import Video, {FilterType} from 'react-native-video';
 
@@ -44,6 +44,8 @@ import RNFetchBlob from 'rn-fetch-blob';
 import DocumentPicker from 'react-native-document-picker';
 
 import LinearGradient from 'react-native-linear-gradient';
+
+import messaging from '@react-native-firebase/messaging';
 
 const Drawer = createDrawerNavigator();
 
@@ -61,15 +63,34 @@ export default function MainTrainerScreen({navigation}) {
 
 const TrainerScreen = ({navigation}) => {
 
+  const serverUrl = urlServer.url;
+
   const dispatch = useDispatch();
 
   const T_trainer = useSelector(state => state.T_trainer);
   const state = useSelector(state => state.changeState);
-  console.log('T', T_trainer);
+
 
   useEffect(() => {
+
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+        Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+
+    messaging()
+    .subscribeToTopic('entrenador')
+    .then(() => console.log(' subscribe to entrenador'))
+    .catch(error => console.log('error subscribed', error));
+
+    const background = messaging().setBackgroundMessageHandler(async remoteMessage => {
+      console.log('notification background', JSON.stringify(remoteMessage))
+    });
+  
     
-    return () => {
+    return (unsubscribe, background) => {
+      unsubscribe();
+      //topicSubscriber();
+      background();
       dispatch(changeState(!state));
     }
 
@@ -103,6 +124,8 @@ const TrainerScreen = ({navigation}) => {
     boolean: false,
     data: {}
   });
+
+
 
    // add photograph    begin _____________________________________________________________________
 
@@ -170,10 +193,11 @@ const TrainerScreen = ({navigation}) => {
 
       const resp = await axios({
         method: 'post',
-        url: 'http://192.168.0.9:3002/files/saveimage',
+        url: `${serverUrl}/files/saveimage`,
         data: formData,
         headers
       });
+      console.log('resp', resp);
       setShowButtonPhoto(true);
       setImageNameInputValue('');
       setImagePublic(false);
@@ -277,7 +301,7 @@ const TrainerScreen = ({navigation}) => {
 
       const resp = await axios({
         method: 'post',
-        url: 'http://192.168.0.9:3002/files/savevideo',
+        url: `${serverUrl}/files/savevideo`,
         data: formData,
         headers
       });
@@ -435,7 +459,7 @@ const TrainerScreen = ({navigation}) => {
       try {
         const resp = await axios({
           method: 'post',
-          url: 'http://192.168.0.9:3002/files/savefile',
+          url: `${serverUrl}/files/savefile`,
           data: formData
         });
         console.log('resp', resp);
@@ -529,7 +553,7 @@ const TrainerScreen = ({navigation}) => {
 
   return (
     <>
-      <TopBar navigation={navigation} title={`Bienvenido Entrenador`} returnButton={false} />
+      <TopBar navigation={navigation} title={`Hola ${T_trainer.nombres}`} returnButton={false} />
       
       <ScrollView style={{flex: 1, backgroundColor: Colors.White}}>
         <LinearGradient colors={[Colors.MainBlue, Colors.White]}>
@@ -537,6 +561,20 @@ const TrainerScreen = ({navigation}) => {
             <View style={styles.trainerCard}>
               <Text style={styles.trainerName}>{T_trainer.nombres+' '+T_trainer.apellidos}</Text>
               <Text style={styles.trainerDescription}>{T_trainer.descripcion_entrenador}</Text>
+            </View>
+
+            <View style={styles.optionsCard}>
+              <View style={styles.containerFlexRow}>
+                <Text style={styles.titleOption}>Mis usuarios</Text>
+
+                <TouchableOpacity 
+                      onPress={() => navigation.navigate('ListUsers')}
+                      style={styles.buttonIconShowOptions}>
+                      <Icon name="angle-double-right" size={24} style={styles.iconShowOptions} color="#fff" />
+                </TouchableOpacity>
+
+              </View>
+              <View style={styles.blueLine}></View>
             </View>
 
             <View style={styles.optionsCard}>
@@ -600,7 +638,8 @@ const TrainerScreen = ({navigation}) => {
                    <View style={styles.containerBorderFileOptions}>
                         <TextInput 
                             style={styles.nameInput}
-                            placeholderTextColor="#000"
+                            placeholderTextColor="#999"
+                            placeholder="Escribe el nombre aquí"
                             multiline={false}
                             onChangeText={ (text) => setImageNameInputValue(text)}
                         />
@@ -734,7 +773,8 @@ const TrainerScreen = ({navigation}) => {
                    <View style={styles.containerBorderFileOptions}>
                         <TextInput 
                             style={styles.nameInput}
-                            placeholderTextColor="#000"
+                            placeholderTextColor="#999"
+                            placeholder="Escribe el nombre aquí"
                             multiline={false}
                             onChangeText={ (text) => setVideoNameInputValue(text)}
                         />
@@ -917,7 +957,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 5,
     width: Dimensions.get('window').width * 0.9,
-    marginBottom: 40
+    marginBottom: 80
   },
   trainerName:{
     fontSize: 22,
@@ -1127,14 +1167,13 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 5,
     borderTopRightRadius: 5,
     borderBottomLeftRadius: 5,
-    borderColor: '#000',
-    height: 80,
-    width: 80,
+    borderColor: Colors.MainBlue,
     marginBottom: 10
   },
   nameInput:{
     color: '#000',
-    fontSize: 20
+    fontSize: 16,
+    width: Dimensions.get('window').width * 0.8
   },
   
 
