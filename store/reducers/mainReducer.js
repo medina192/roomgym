@@ -12,7 +12,8 @@ const initialState = {
     currentRoutine: {},
     currentExercise: {},
     changeState: false,
-    imageSliderCancel: false
+    imageSliderCancel: false,
+    changeStateForDocuments: false
 }
 
 export const mainReducer = (state = initialState, action) => {
@@ -73,6 +74,11 @@ export const mainReducer = (state = initialState, action) => {
                 ...state,
                 changeState: action.payload.state
             }
+        case types.changeStateForDocuments:
+            return{
+                ...state,
+                changeStateForDocuments: action.payload.changeStateForDocuments
+            }            
         case types.clearState:
             return{
                 user: '',

@@ -701,12 +701,18 @@ const CreatePdfScreen = ({navigation}) => {
                             <Text style={styles.textBold}>28</Text>
                         </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={createPdf}  style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
+            <TouchableOpacity 
+              //onPress={createPdf}  
+              style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
               <Text style={{color:'#fff', fontSize: 16, fontWeight: '700', textAlign:'center'}}>Crear Pdf</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={downloadPdf1} style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
-              <Text style={{color:'#fff', fontSize: 16, fontWeight: '700', textAlign: 'center'}}>Descargar Pdf</Text>
-            </TouchableOpacity>
+            {
+              /*
+              <TouchableOpacity onPress={downloadPdf1} style={{backgroundColor: Colors.MainBlue, padding: 10, marginVertical: 10, marginLeft: 20, width: 200}}>
+                <Text style={{color:'#fff', fontSize: 16, fontWeight: '700', textAlign: 'center'}}>Descargar Pdf</Text>
+              </TouchableOpacity>
+              */
+            }
 
         </ScrollView>
         <BottomBar navigation={navigation}/>

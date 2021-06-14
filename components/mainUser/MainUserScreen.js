@@ -238,8 +238,9 @@ const UserScreen = ({navigation}) => {
 
     createTable();
 
-
-
+    //downloadPdf();
+    //deleteData();
+    //getData();
   }, [])
 
 
@@ -252,7 +253,22 @@ const UserScreen = ({navigation}) => {
           console.log('Results', results);
           console.log('tx', tx);
           if (results.rowsAffected > 0) {
-            Alert.alert('Data Inserted Successfully....');
+            //Alert.alert('Data Inserted Successfully....');
+          } else Alert.alert('Failed....');
+        }
+      );
+    });
+  }
+
+  const deleteData = () => {
+    db.transaction(function (tx) {
+      tx.executeSql(
+        'DELETE FROM UserFiles',
+        (tx, results) => {
+          console.log('Results delete', results);
+          console.log('tx', tx);
+          if (results.rowsAffected > 0) {
+            //Alert.alert('Data Inserted Successfully....');
           } else Alert.alert('Failed....');
         }
       );
@@ -266,7 +282,8 @@ const UserScreen = ({navigation}) => {
         [],
         (tx, results) => {
           var temp = [];
-          console.log('results', results);
+          console.log('results get', results);
+          console.log('length', results.rows.length);
           for (let i = 0; i < results.rows.length; ++i)
           {
             temp.push(results.rows.item(i));
@@ -277,6 +294,61 @@ const UserScreen = ({navigation}) => {
  
     });
   }
+
+  //const urlInServer = `https://res.cloudinary.com/dvtdipogm/video/upload/v1623434542/hqy7eflugfnf2kxnxfp7.mp4`;
+
+  const urlInServer = `https://res.cloudinary.com/dvtdipogm/video/upload/v1623693764/u53q4vxzvwxtxc6btc5a.mp4`;
+  const downloadPdf = () => {
+
+    // Main function to download the image
+    // https://aboutreact.com/download-image-in-react-native/    image
+    // To add the time suffix in filename
+    let date = new Date();
+    // Image URL which we want to download
+    let image_URL = urlInServer;    
+    // Getting the extention of the file
+    let ext = getExtention(image_URL);
+    ext = '.' + ext[0];
+    // Get config and fs from RNFetchBlob
+    // config: To pass the downloading related options
+    // fs: Directory path where we want our image to download
+    const { config, fs } = RNFetchBlob;
+
+    let PictureDir = fs.dirs.PictureDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        // Related to the Android only
+        useDownloadManager: true,
+        notification: true,
+        path:
+          PictureDir +
+          '/video_' + 
+          Math.floor(date.getTime() + date.getSeconds() / 2) +
+          ext,
+        description: 'pdf',
+      },
+    };
+    console.log('options', options);
+    config(options)
+      .fetch('GET', image_URL)
+      .then(res => {
+        // Showing alert after successful downloading
+        console.log('res --------> ', res);
+        const pathLocalDocument = `file://${res.data}`;
+        insertData(pathLocalDocument );
+        alert('video Downloaded Successfully.');
+      })
+      .catch(err => {
+          console.log('error ----------------------------------', err);
+      });
+  };
+
+  const getExtention = filename => {
+    // To get the file extension
+    return /[.]/.exec(filename) ?
+             /[^.]+$/.exec(filename) : undefined;
+  };
 
 
   //UPDATE users SET first_name = ? , last_name = ? WHERE id = ?', ["Doctor", "Strange", 3]

@@ -54,17 +54,28 @@ const BottomBar = ({ navigation}) => {
         (
           <View style={styles.containerBottomBar}>
             <TouchableOpacity onPress={() => changeUserScreen('Routines')}>
-              <Icon name="envelope" size={24} style={styles.iconBottomBar} color="#fff" />
+              <Icon name="trophy" size={24} style={styles.iconBottomBar} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => changeUserScreen('ListTrainers')}>
               <Icon name="group" size={24} style={styles.iconBottomBar} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => changeUserScreen('CustomPlan')}>
-              <Icon name="check" size={24} style={styles.iconBottomBar} color="#fff" />
+              <Icon name="user-o" size={24} style={styles.iconBottomBar} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={user == '' ? () => changeUserScreen('StatisticsUserGeneral') : () => changeUserScreen('Statistics')}>
-              <Icon name="bar-chart-o" size={24} style={styles.iconBottomBar} color="#fff" />
-            </TouchableOpacity>
+            {
+              user == '' ? 
+              (
+                <TouchableOpacity onPress={user == '' ? () => changeUserScreen('StatisticsUserGeneral') : () => changeUserScreen('Statistics')}>
+                  <Icon name="bar-chart-o" size={24} style={styles.iconBottomBar} color="#fff" />
+                </TouchableOpacity>
+              )
+              :
+              (
+                <TouchableOpacity onPress={user == '' ? () => changeUserScreen('Statistics') : () => changeUserScreen('Statistics')}>
+                  <Icon name="bar-chart-o" size={24} style={styles.iconBottomBar} color="#fff" />
+                </TouchableOpacity>
+              )
+            }
         </View>
         )
       }

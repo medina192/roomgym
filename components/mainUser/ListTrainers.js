@@ -152,8 +152,9 @@ const ListTrainersScreen = ({navigation}) => {
 
   return (
     <>
-      <View style={styles.containerListTrainers}>
-        <TopBar navigation={navigation} title={`Lista de entrenadores`} returnButton={true} />
+      <TopBar navigation={navigation} title={`Lista de entrenadores`} returnButton={true} />
+      
+      <View style={styles.containerListTrainers}>  
         <View style={styles.containerButtons}>
           <TouchableOpacity style={myTrainers ? styles.button : styles.buttonPressed } onPress={allTrainersList}>
             <Text style={styles.textButton}>Todos los entrenadores</Text>

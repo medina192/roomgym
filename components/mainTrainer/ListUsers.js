@@ -84,8 +84,8 @@ const ListUsersScreen = ({navigation}) => {
 
   return (
     <>
+      <TopBar navigation={navigation} title={`Usuarios Suscritos`} returnButton={true} />
       <View style={styles.containerListTrainers}>
-        <TopBar navigation={navigation} title={`Usuarios Suscritos`} returnButton={true} />
 
         <View style={{ flex:1}}>
             {(() => { 

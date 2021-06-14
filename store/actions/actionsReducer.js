@@ -111,6 +111,14 @@ export const changeState = (state) => {
     }
 }
 
+export const changeStateForDocuments = (state) => {
+    return {
+        type: types.changeStateForDocuments,
+        payload: {
+            changeStateForDocuments: state
+        }
+    }
+}
 
 export const clearState = () => {
     return {

@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Colors from '../../colors/colors';
 
-const TopBar = ({title, returnButton, navigation}) => {
+const TopBar = ({title, returnButton, navigation, menu = true}) => {
 
   const returnPrevousScreen = () => {
     navigation.goBack();
@@ -30,14 +30,30 @@ const TopBar = ({title, returnButton, navigation}) => {
       {
         returnButton ? (
 
-          <View style={styles.topBarWithButton}>
-            <TouchableOpacity onPress={openMenu}>
-              <Icon name="navicon" size={24} style={styles.iconBottomBar} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.titleTopBar}>{title}</Text>
-            <TouchableOpacity onPress={returnPrevousScreen}>
-              <Icon name="mail-reply" size={24} style={styles.iconBottomBar} color="#fff" />
-            </TouchableOpacity>
+          <View>
+            {
+              menu ? (
+                <View style={styles.topBarWithButton}>
+                  <TouchableOpacity onPress={openMenu}>
+                    <Icon name="navicon" size={24} style={styles.iconBottomBar} color="#fff" />
+                  </TouchableOpacity>
+                  <Text style={styles.titleTopBar}>{title}</Text>
+                  <TouchableOpacity onPress={returnPrevousScreen}>
+                    <Icon name="mail-reply" size={24} style={styles.iconBottomBar} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              )
+              :
+              (
+                <View style={styles.topBarWithButton}>
+                    <Icon name="navicon" size={24} style={styles.hideHamburggerMenu} color={Colors.MainBlue} />
+                  <Text style={styles.titleTopBar}>{title}</Text>
+                  <TouchableOpacity onPress={returnPrevousScreen}>
+                    <Icon name="mail-reply" size={24} style={styles.iconBottomBar} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              )
+            }
           </View>
         )
         : (
@@ -103,6 +119,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center'
   },
+  hideHamburggerMenu:{
+    color: Colors.MainBlue
+  }
 });
 
 export default TopBar;

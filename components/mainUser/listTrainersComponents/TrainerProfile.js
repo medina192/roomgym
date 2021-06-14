@@ -51,6 +51,7 @@ const TrainerProfileScreen = ({navigation}) => {
 
   const trainer = useSelector(state => state.trainer);
   const user = useSelector(state => state.user);
+  const stateAux = useSelector(state => state.changeStateForDocuments);
 
   const [userSubscribed, setUserSubscribed] = useState({
     state_subscription: 0,
@@ -62,8 +63,22 @@ const TrainerProfileScreen = ({navigation}) => {
     loaded: false,
     files: []
   });
+
   const [state, setState] = useState(false);
 
+  
+
+  useEffect(() => {
+
+    if(user == '')
+    {
+
+    }
+    else{
+      getDownloadedFiles();
+    }
+
+  }, [stateAux]);
 
   useEffect(() => {
     verifyRelation();
@@ -74,22 +89,25 @@ const TrainerProfileScreen = ({navigation}) => {
 
     }
     else{
+
       getDownloadedFiles();
     }
 
   }, []);
 
   const getDownloadedFiles = () => {
+
     db.transaction((tx) => {
       tx.executeSql(
         'SELECT * FROM UserFiles',
         [],
         (tx, results) => {
           var temp = [];
+
           for (let i = 0; i < results.rows.length; ++i)
           {
             temp.push(results.rows.item(i));
-            console.log('results---', results.rows.item(i));
+            //console.log('results---', results.rows.item(i));
           }
           setDownloadedFiles({
             loaded: true,
@@ -174,7 +192,7 @@ const TrainerProfileScreen = ({navigation}) => {
 
     if(user == '')
     {
-      console.log('subscribe');
+      //console.log('subscribe');
     }
     else{
       const dateSubscription = new Date();
@@ -250,7 +268,7 @@ const TrainerProfileScreen = ({navigation}) => {
       }
     })
     .then(function (response) {
-      console.log('response', response.data.resp); 
+      //console.log('response', response.data.resp); 
       setDocuments(response.data.resp);
     })
     .catch(function (error) {
@@ -271,19 +289,19 @@ const TrainerProfileScreen = ({navigation}) => {
             </View>
             <View style={styles.containerDescription}>
               <Text style={styles.description}>
-                survived not only five centuries, but also the leap into electronic 
-                typesetting, remaining essentially unchanged. It was popularised in the 1960s
-                with the release of Letraset sheets containing Lorem Ipsum passages, and more
-                recently with desktop publishing software like Aldus PageMaker including 
-                versions of Lorem Ipsum
+                {trainer.descripcion_entrenador}
               </Text>
             </View>
-            <View style={styles.containerContactInformation}>
+            {
+              /*
+                          <View style={styles.containerContactInformation}>
                 <Icon name="envelope" size={24} style={styles.iconContact} color="#fff" />
                 <Icon name="instagram" size={24} style={styles.iconContact} color="#fff" />
                 <Icon name="facebook-square" size={24} style={styles.iconContact} color="#fff" />
                 <Icon name="twitter-square" size={24} style={styles.iconContact} color="#fff" />
             </View>
+              */
+            }
           </View>
           {
             userSubscribed.userSubscribedStatus ? 
@@ -297,11 +315,26 @@ const TrainerProfileScreen = ({navigation}) => {
             )
             : 
             (
-            <View style={styles.containerButtonSubscribe}>
-              <TouchableOpacity style={styles.buttonSubscribe} onPress={ subscribe }>
-                <Text style={styles.textButoonSubscribe}>Suscribirse</Text>
-              </TouchableOpacity>
-            </View>
+              <View>
+                {
+                  user == '' ? 
+                  (
+                    <View style={styles.containerButtonSubscribe}>
+                      <TouchableOpacity style={styles.buttonSubscribe} disabled={true} onPress={ subscribe }>
+                        <Text style={styles.textButoonSubscribe}>Necesitas registrarte para suscribirte</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                  :
+                  (
+                    <View style={styles.containerButtonSubscribe}>
+                      <TouchableOpacity style={styles.buttonSubscribe} onPress={ subscribe }>
+                        <Text style={styles.textButoonSubscribe}>Suscribirse</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                }
+              </View>
             )
           }
 
@@ -328,6 +361,7 @@ const TrainerProfileScreen = ({navigation}) => {
            }
            <View>
              {
+
                documents.length > 0 && downloadedFiles.loaded ?
                (
                 <View>
@@ -335,7 +369,6 @@ const TrainerProfileScreen = ({navigation}) => {
                     <Text style={{fontSize: 16, fontWeight: '700', marginTop: 10, marginBottom: 5}}>Videos</Text>
                     {
                       documents.map( (document, indexDocument) => {
-
                         if(document.tipo === 'video')
                         {
                           const index___ = document.nombreDocumento.search('___');
@@ -350,22 +383,21 @@ const TrainerProfileScreen = ({navigation}) => {
                           {
                             //console.log('jjjjjjjjjj',downloadedFiles.files[i].idDocumentMysql);
                             
-                            console.log('---------------------------------------------------------');
-                            console.log('local ', downloadedFiles.files[i].idDocumentMysql, '   ', 'server', document.idDocumentos);
-                            console.log('---------------------------------------------------------');
+                            //console.log('---------------------------------------------------------');
+                            //console.log('local ', downloadedFiles.files[i].idDocumentMysql, '   ', 'server', document.idDocumentos);
+                            //console.log('---------------------------------------------------------');
                             if(downloadedFiles.files[i].idDocumentMysql == document.idDocumentos)
                             {
-                              console.log('if');
                               downloadedFileBoolean = true;
                               downloadedFile = downloadedFiles.files[i];
                               break;
                             }
-                            
+   
                           }
-
+                          let urlCloudinary = document.url;
                           return(
                             <TouchableOpacity key={indexDocument}
-                              onPress={ () => navigation.navigate('WatchVideo',{ document, downloadedFile, downloadedFileBoolean})}
+                              onPress={ () => navigation.navigate('WatchVideo',{ document, downloadedFile, downloadedFileBoolean, urlCloudinary})}
                               style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
                               <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
                               <View>
@@ -407,7 +439,7 @@ const TrainerProfileScreen = ({navigation}) => {
                           
                             if(downloadedFiles.files[i].idDocumentMysql == document.idDocumentos)
                             {
-                              console.log('if');
+
                               downloadedFileBoolean = true;
                               downloadedFile = downloadedFiles.files[i];
                               break;

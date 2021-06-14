@@ -39,12 +39,16 @@ const TrainerCard = ({trainer, navigation}) => {
                 {trainer.item.descripcion_entrenador}
               </Text>
             </View>
-            <View style={styles.containerContactInformation}>
+            {
+              /*
+                          <View style={styles.containerContactInformation}>
                 <Icon name="envelope" size={24} style={styles.iconContact} color="#fff" />
                 <Icon name="instagram" size={24} style={styles.iconContact} color="#fff" />
                 <Icon name="facebook-square" size={24} style={styles.iconContact} color="#fff" />
                 <Icon name="twitter-square" size={24} style={styles.iconContact} color="#fff" />
             </View>
+              */
+            }
           </View>
           <View style={styles.containerButtonSubscribe}>
           <TouchableOpacity style={styles.buttonSubscribe} onPress={ watchProfile }>

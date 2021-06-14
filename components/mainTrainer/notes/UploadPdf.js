@@ -149,8 +149,6 @@ const UploadPdfScreen = ({navigation}) => {
         */
       }
 
-      console.log('uri', pdfAdded.data.uri);
-
 
       const savePdf = () => {
         
@@ -279,7 +277,7 @@ const UploadPdfScreen = ({navigation}) => {
                           <View style={styles.containerButtonsSave}>          
                               <TouchableOpacity
                                   style={styles.buttonSavePdf}
-                                  onPress={savePdf}
+                                  //onPress={savePdf}
                               >
                                   <Icon name="cloud-upload" size={24} style={styles.iconSave} color={Colors.MainBlue} />
                               </TouchableOpacity>

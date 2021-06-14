@@ -10,6 +10,7 @@ export const types = {
     T_routinesSaved: 'T_routinesSaved',
     currentExercise: 'currentExercise',
     changeState: 'changeState',
+    changeStateForDocuments: 'changeStateForDocuments',
     clearState: 'clearState',
     imageSliderCancel: 'imageSliderCancel'
 }

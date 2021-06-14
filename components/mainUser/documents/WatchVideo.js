@@ -25,41 +25,45 @@ import Video, {FilterType} from 'react-native-video';
 
 import { openDatabase } from 'react-native-sqlite-storage';
 
+import { changeStateForDocuments } from '../../../store/actions/actionsReducer';
+
+import { useDispatch, useSelector } from 'react-redux';
+
 
 const db = openDatabase({ name: 'roomGym.db' });
 
 
 const WatchVideo = ({navigation, route}) => {
 
+  const dispatch = useDispatch();
+
   const [urlPdf, seturlPdf] = useState('');
+
+  const state = useSelector(state => state.changeStateForDocuments);
 
   useEffect(() => {
     if(route.params.downloadedFileBoolean)
     {
-
-      console.log('--------------------------------------------------------------');
-      console.log('if', urlPdf);
       seturlPdf(route.params.downloadedFile.urlInPhone);
     }
     else{
-      console.log('--------------------------------------------------------------');
+
       const urlPdf = route.params.document.url;
-      console.log('else', urlPdf);
       seturlPdf(route.params.document.url);
     }
-    
-  }, [])
+
+  }, []);
 
     const serverUrl = urlServer.url;
 
-
     const source = {uri: urlPdf,cache:true};
-    console.log('source', source);
+    //console.log('source', source);
     //console.log(route.params.document);
     //const source = {uri:'https://www.ti.com/lit/ds/symlink/lm555.pdf',cache:true};
 
 
-    const urlInServer = `${serverUrl}/videos/${route.params.document.nombreDocumento}`;
+    //const urlInServer = `${serverUrl}/videos/${route.params.document.nombreDocumento}`;
+    const urlInServer = route.params.urlCloudinary;
 
     const downloadPdf = () => {
 
@@ -97,9 +101,10 @@ const WatchVideo = ({navigation, route}) => {
           .fetch('GET', image_URL)
           .then(res => {
             // Showing alert after successful downloading
-            console.log('res --------> ', JSON.stringify(res));
+            //console.log('res --------> ', JSON.stringify(res));
             const pathLocalDocument = `file://${res.data}`;
             insertData(pathLocalDocument );
+            dispatch(changeStateForDocuments(!state));
             alert('video Downloaded Successfully.');
           })
           .catch(err => {
@@ -148,7 +153,7 @@ const WatchVideo = ({navigation, route}) => {
               for (let i = 0; i < results.rows.length; ++i)
               {
                 temp.push(results.rows.item(i));
-                console.log('results---', results.rows.item(i));
+                //console.log('results---', results.rows.item(i));
               }
             }
           );
@@ -158,18 +163,37 @@ const WatchVideo = ({navigation, route}) => {
 
       getData();
 
-
-      console.log('uuuuuuuuuuuuu', urlPdf);
+      const jeje = () => {
+        dispatch(changeStateForDocuments(!state));
+        console.log('aaaaaaaaaaa', state);
+      }
 
   return (
     <>
-       <TopBar navigation={navigation} title={'Video'} returnButton={true}/>
-
+       <TopBar navigation={navigation} title={'Video'} returnButton={true} menu={false}/>
        <TouchableOpacity 
-            onPress={downloadPdf}
-            style={{backgroundColor: Colors.Orange, padding: 5, margin: 20}}>
-            <Text style={{color: '#fff', fontWeight: '700', fontSize: 16}}>Descargar</Text>
-        </TouchableOpacity>
+              onPress={jeje}
+              style={{backgroundColor: Colors.Orange, padding: 5, margin: 20}}>
+              <Text style={{color: '#fff', fontWeight: '700', fontSize: 16}}>change</Text>
+            </TouchableOpacity>
+        {
+          route.params.downloadedFileBoolean ? 
+          (
+            <TouchableOpacity 
+              disabled={true}
+              style={{backgroundColor: Colors.Orange, padding: 5, margin: 20}}>
+              <Text style={{color: '#fff', fontWeight: '700', fontSize: 16}}>Ya descargaste este video</Text>
+            </TouchableOpacity>
+          )
+          :
+          (
+            <TouchableOpacity 
+              onPress={downloadPdf}
+              style={{backgroundColor: Colors.Orange, padding: 5, margin: 20}}>
+              <Text style={{color: '#fff', fontWeight: '700', fontSize: 16}}>Descargar</Text>
+            </TouchableOpacity>
+          )
+        }
 
         {
           (!urlPdf == '') ? 
