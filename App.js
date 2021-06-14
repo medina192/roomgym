@@ -67,6 +67,7 @@ import UploadPdf from './components/mainTrainer/notes/UploadPdf';
 import SplashScreen from 'react-native-splash-screen'
 import ListGyms from './components/gyms/ListGyms';
 import GymProfile from './components/gyms/GymProfile';
+import StatisticsUserGeneral from './components/mainUser/statistics/StatistcisGeneralUser';
 
 const Stack = createStackNavigator();
 
@@ -237,6 +238,13 @@ const App = () => {
             <Stack.Screen 
               name="Statistics"
               component={Statistics}
+              options={{
+                header: () => null
+              }}
+            />
+            <Stack.Screen 
+              name="StatisticsUserGeneral"
+              component={StatisticsUserGeneral}
               options={{
                 header: () => null
               }}

@@ -8,6 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 
+import RNFetchBlob from 'rn-fetch-blob';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -18,6 +19,14 @@ import TopBar from '../../shared/TopBar';
 import Colors from '../../../colors/colors';
 import SideBarUser from '../../shared/SideBarUser';
 import BottomBar from '../../shared/BottomBarUser';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import { changeState } from '../../../store/actions/actionsReducer';
+
+import { openDatabase } from 'react-native-sqlite-storage';
+
+const db = openDatabase({ name: 'roomGym.db' });
 
 
 const Drawer = createDrawerNavigator();
@@ -34,7 +43,100 @@ export default function MainUserGeneralScreen({navigation}) {
 
 const UserGeneralScreen = ({navigation}) => {
 
+  const [stopImageSlider, setStopImageSlider] = useState(false);
 
+  const state = useSelector(state => state.changeState);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+  
+    const createTable = () => {
+      db.transaction(function (txn) {
+        txn.executeSql(
+          //"SELECT name FROM sqlite_master WHERE type='table' AND name='Student_Table'",
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='GeneralUser'",
+          [],
+          function (tx, res) {
+            
+            
+            if (res.rows.length == 0) {
+              txn.executeSql('DROP TABLE IF EXISTS GeneralUser', []);
+              txn.executeSql(
+                'CREATE TABLE IF NOT EXISTS GeneralUser(id INTEGER PRIMARY KEY AUTOINCREMENT, nombre VARCHAR(30), ejercicios TEXT, tipo VARCHAR(15))',
+                []
+              );
+            }
+            
+          }
+        );
+      })
+
+    };
+
+    createTable();
+
+
+    const downloadPdf = () => {
+
+      // Main function to download the image
+      // https://aboutreact.com/download-image-in-react-native/    image
+      // To add the time suffix in filename
+      let date = new Date();
+      // Image URL which we want to download
+      let image_URL = 'https://res.cloudinary.com/dvtdipogm/image/upload/v1623355459/ob78hihastd1lkumu3gq.png';    
+      // Getting the extention of the file
+      let ext = getExtention(image_URL);
+      ext = '.' + ext[0];
+      // Get config and fs from RNFetchBlob
+      // config: To pass the downloading related options
+      // fs: Directory path where we want our image to download
+      const { config, fs } = RNFetchBlob;
+  
+      let PictureDir = fs.dirs.PictureDir;
+      let options = {
+        fileCache: true,
+        addAndroidDownloads: {
+          // Related to the Android only
+          useDownloadManager: true,
+          notification: true,
+          path:
+            PictureDir +
+            '/video_' + 
+            Math.floor(date.getTime() + date.getSeconds() / 2) +
+            ext,
+          description: 'pdf',
+        },
+      };
+      console.log('options', options);
+      config(options)
+        .fetch('GET', image_URL)
+        .then(res => {
+          // Showing alert after successful downloading
+          console.log('res --------> ', JSON.stringify(res));
+          const pathLocalDocument = `file://${res.data}`;
+          //insertData(pathLocalDocument );
+          alert('video Downloaded Successfully.');
+        })
+        .catch(err => {
+            console.log('error ----------------------------------', err);
+        });
+    };
+
+
+    //downloadPdf();
+
+    return () => {
+      setStopImageSlider(true);
+      dispatch(changeState(!state));
+    }
+  }, [])
+
+  const getExtention = filename => {
+    // To get the file extension
+    return /[.]/.exec(filename) ?
+             /[^.]+$/.exec(filename) : undefined;
+  };
   
   const changeUserScreen = (newScreen) => {
     navigation.navigate(newScreen);
@@ -48,7 +150,7 @@ const UserGeneralScreen = ({navigation}) => {
 
   return (
     <>
-        <TopBar navigation={navigation} title={`Bienvenido Usuario`} returnButton={false} />
+        <TopBar navigation={navigation} title={`Bienvenido Usuario`} returnButton={true} />
         <ScrollView style={styles.containerScrollView}>
           <ImageSlider />          
           <View style={styles.containerTextDescriptionButton}>
@@ -94,36 +196,21 @@ const UserGeneralScreen = ({navigation}) => {
           </View>
           <View style={styles.containerTouchableImage}>
             <TouchableOpacity style={styles.touchableContainerImage}
-              onPress={() => changeUserScreen('Statistics')} >
+              onPress={() => changeUserScreen('StatisticsUserGeneral')} >
               <ImageBackground source={ require('../../../assets/img/_4.jpg')} style={styles.imageButton}>
                 <Text style={styles.textImageButton}>Estadísticas</Text>
               </ImageBackground>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.containerButtonSubscribe}>
-            <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('MainTrainerScreen')}>
-              <Text style={styles.textButoonSubscribe}>Pantalla Entrenador</Text>
+          <View style={styles.containerTouchableImage}>
+            <TouchableOpacity style={styles.touchableContainerImage}
+              onPress={() => changeUserScreen('ListGyms')} >
+              <ImageBackground source={ require('../../../assets/img/_6.jpg')} style={styles.imageButton}>
+                <Text style={styles.textImageButton}>Gimnasios</Text>
+              </ImageBackground>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('Registro')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Registro</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ () => navigation.navigate('Login')}>
-            <Text style={styles.textButoonSubscribe}>Pantalla Login</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.containerButtonSubscribe}>
-          <TouchableOpacity style={styles.buttonSubscribe} onPress={ openMenu}>
-            <Text style={styles.textButoonSubscribe}>drawer</Text>
-          </TouchableOpacity>
-        </View>
 
         </ScrollView>
 

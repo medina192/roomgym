@@ -55,7 +55,7 @@ const UserProfileScreen = ({navigation}) => {
   const trainer = useSelector(state => state.T_trainer);
   const user = useSelector(state => state.T_user);
   const idRelation = useSelector(state => state.idRelation);
-
+  console.log(user);
   useEffect(() => {
     verifyRelation();
     
@@ -167,7 +167,7 @@ const UserProfileScreen = ({navigation}) => {
 
   return (
     <>
-       <TopBar navigation={navigation} title={'user profile'} returnButton={true}/>
+       <TopBar navigation={navigation} title={'Usuario'} returnButton={true}/>
         <ScrollView style={{padding: 15, flex: 1, marginBottom: 10}}>
           <View style={styles.trainerCard}>
             <View style={styles.containerImage_Name}>

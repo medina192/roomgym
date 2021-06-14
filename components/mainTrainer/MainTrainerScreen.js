@@ -88,9 +88,9 @@ const TrainerScreen = ({navigation}) => {
   
     
     return (unsubscribe, background) => {
-      unsubscribe();
+      //unsubscribe();
       //topicSubscriber();
-      background();
+      //background();
       dispatch(changeState(!state));
     }
 
@@ -124,6 +124,8 @@ const TrainerScreen = ({navigation}) => {
     boolean: false,
     data: {}
   });
+
+  const [disableButton, setDisableButton] = useState(false);
 
 
 
@@ -185,6 +187,8 @@ const TrainerScreen = ({navigation}) => {
       headers
     }
 
+    setDisableButton(true);
+
     try {
 
       const formData = new FormData();
@@ -193,11 +197,12 @@ const TrainerScreen = ({navigation}) => {
 
       const resp = await axios({
         method: 'post',
-        url: `${serverUrl}/files/saveimage`,
+        url: `${serverUrl}/files/saveimagecloud`,
         data: formData,
         headers
       });
-      console.log('resp', resp);
+      
+      setDisableButton(false);
       setShowButtonPhoto(true);
       setImageNameInputValue('');
       setImagePublic(false);
@@ -209,6 +214,7 @@ const TrainerScreen = ({navigation}) => {
      console.log('respones', resp);
     } catch (error) {
       console.log('error submiting image', error);
+      setDisableButton(false);
     }
   }
 
@@ -265,6 +271,8 @@ const TrainerScreen = ({navigation}) => {
 
   const uploadVideo = async (data) => {
     
+    
+
     const fileToUpload = {
       uri: data.uri,
       type: 'video/mp4',
@@ -293,6 +301,8 @@ const TrainerScreen = ({navigation}) => {
       headers
     }
 
+    setDisableButton(true);
+
     try {
 
       const formData = new FormData();
@@ -301,10 +311,11 @@ const TrainerScreen = ({navigation}) => {
 
       const resp = await axios({
         method: 'post',
-        url: `${serverUrl}/files/savevideo`,
+        url: `${serverUrl}/files/savevideocloud`,
         data: formData,
         headers
       });
+      setDisableButton(false);
       setShowButtonVideo(true);
       setVideoNameInputValue('');
       setVideoPublic(false);
@@ -316,6 +327,7 @@ const TrainerScreen = ({navigation}) => {
      console.log('respones', resp);
     } catch (error) {
       console.log('error submiting image', error);
+      setDisableButton(false);
     }
   }
 
@@ -692,6 +704,7 @@ const TrainerScreen = ({navigation}) => {
                   </TouchableOpacity>
                   <TouchableOpacity
                       onPress={savePhoto}
+                      disabled={disableButton}
                       style={styles.containerIconButtonAdd}>
                       <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
                   </TouchableOpacity>
@@ -827,6 +840,7 @@ const TrainerScreen = ({navigation}) => {
                   </TouchableOpacity>
                   <TouchableOpacity
                       onPress={saveVideo}
+                      disabled={disableButton}
                       style={styles.containerIconButtonAdd}>
                       <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
                   </TouchableOpacity>

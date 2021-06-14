@@ -52,13 +52,10 @@ const WatchVideo = ({navigation, route}) => {
 
     const serverUrl = urlServer.url;
 
-    console.log('down', route.params.downloadedFile);
-    console.log('down', route.params.downloadedFileBoolean);
-
-
 
     const source = {uri: urlPdf,cache:true};
-    console.log(route.params.document);
+    console.log('source', source);
+    //console.log(route.params.document);
     //const source = {uri:'https://www.ti.com/lit/ds/symlink/lm555.pdf',cache:true};
 
 

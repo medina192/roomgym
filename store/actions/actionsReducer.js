@@ -117,3 +117,13 @@ export const clearState = () => {
         type: types.clearState
     }
 }
+
+
+export const imageSliderCancel = (cancel) => {
+    return {
+        type: types.imageSliderCancel,
+        payload: {
+            cancel
+        }
+    }
+}

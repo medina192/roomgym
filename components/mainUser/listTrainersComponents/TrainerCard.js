@@ -24,6 +24,8 @@ const TrainerCard = ({trainer, navigation}) => {
     navigation.navigate('TrainerProfile');
   }
 
+  console.log(trainer);
+
   return (
     <>
        <View style={styles.containerTrainerCard}>
@@ -34,11 +36,7 @@ const TrainerCard = ({trainer, navigation}) => {
             </View>
             <View style={styles.containerDescription}>
               <Text style={styles.description}>
-                survived not only five centuries, but also the leap into electronic 
-                typesetting, remaining essentially unchanged. It was popularised in the 1960s
-                with the release of Letraset sheets containing Lorem Ipsum passages, and more
-                recently with desktop publishing software like Aldus PageMaker including 
-                versions of Lorem Ipsum
+                {trainer.item.descripcion_entrenador}
               </Text>
             </View>
             <View style={styles.containerContactInformation}>

@@ -8,7 +8,8 @@ import {
   Dimensions,
   TextInput,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -37,6 +38,9 @@ import AlertComponent from '../../shared/AlertComponent';
 
 //import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
+import { openDatabase } from 'react-native-sqlite-storage';
+
+const db = openDatabase({ name: 'roomGym.db' });
 
 const Drawer = createDrawerNavigator();
 
@@ -84,8 +88,7 @@ const SubCategoriesScreen = ({navigation, route}) => {
 
 
   useEffect(() => {
-    
-    console.log('sssss', subCategories);
+
     let auxObject = [];
     for(let i = 0; i < subCategories.length; i++)
     {
@@ -101,12 +104,6 @@ const SubCategoriesScreen = ({navigation, route}) => {
     setExercises(auxObject);
 
   }, []);
-
-  const changeToSubRoutine = (categorie) => {
-
-      dispatch(saveSubRoutine(categorie));
-      navigation.navigate('SubRoutines');
-  }
 
 
   const setCheckBoxValue = (value, index) => {
@@ -157,7 +154,7 @@ const SubCategoriesScreen = ({navigation, route}) => {
 
         for(let i = 0; i < exercises.length; i++)
         {
-          console.log('---------',exercises[i].repetitions);
+
           console.log(exercises[i].repetitions != '0');
           if(exercises[i].selected)
           {
@@ -265,6 +262,49 @@ const SubCategoriesScreen = ({navigation, route}) => {
 
     setMainIndicator(true);
 
+    if(user == '')
+    {
+      const insertData = () => {
+        db.transaction(function (tx) {
+          tx.executeSql(
+            'INSERT INTO GeneralUser (nombre, ejercicios, tipo) VALUES (?,?,?)',
+            [nameRoutine, exercisesString, categorie],
+            (tx, results) => {
+              setMainIndicator(false);
+              console.log('Results', results);
+              console.log('tx', tx);
+              if (results.rowsAffected > 0) {
+                //Alert.alert('Data Inserted Successfully....');
+                setShowAlert({
+                  show: true,
+                  type: 'good',
+                  action: 'close', 
+                  message: 'La rutina fue guardada satisfactoriamente', 
+                  title: 'Rutina guardada con éxito', 
+                  iconAlert: 'save',
+                  nextScreen: 'MyGymTrainer'
+                });
+              } 
+              else{
+                //Alert.alert('Failed....');
+                setShowAlert({
+                  show: true,
+                  type: 'error',
+                  action: 'close', 
+                  message: 'Verifica tu conexión a internet o notifica al equipo de GymRoom sobre el problema', 
+                  title: 'No se pudo conectar con el servidor', 
+                  iconAlert: 'wifi',
+                  nextScreen: 'MyGymTrainer'
+                });
+              };
+            }
+          );
+        });
+      }
+      insertData();
+    }
+    else{
+      
     axios({
       method: 'post',
       url: `${serverUrl}/userscreens/saveroutinebyuser`,
@@ -294,13 +334,14 @@ const SubCategoriesScreen = ({navigation, route}) => {
             show: true,
             type: 'error',
             action: 'close', 
-            message: 'Verifica tu conexión a internet o notifica al equipo de GymRoom sobre el problema', 
-            title: 'No se pudo conectar con el servidor', 
+            message: 'Hubo un error con tu base de datos local', 
+            title: 'No se pudo guardar tu rutina', 
             iconAlert: 'wifi',
             nextScreen: 'MyGymTrainer'
           });
         }
       });
+    }
 
   }
  

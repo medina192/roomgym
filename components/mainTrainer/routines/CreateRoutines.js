@@ -395,7 +395,7 @@ const CreateRoutinesScreen = ({navigation}) => {
     .then(function (response) {
         console.log('saved',response.data);
         setMainIndicator(false);
-        //setRoutinesSaved(response.data.routines);
+        setRoutinesSaved(response.data.routines);
     })
     .catch(function (error) {
         //console.log('error axios',error);

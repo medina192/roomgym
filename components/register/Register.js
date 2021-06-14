@@ -424,6 +424,17 @@ const sendForm = () => {
               console.log('good, user registered',response);
               setMainIndicator(false);
               bodyUser.idusuario = response.data.resp.insertId;
+              setform({
+                nombres: '',
+                apellidos: '',
+                email: '',
+                password: '',
+                confirmPassword: '',
+                fecha_de_nacimiento: '',
+                descripcion: '',
+                cedula: '',
+                tipo_de_cuenta: ''
+              });
               navigation.navigate('ChooseRole',bodyUser);
               //dispatch(saveUser(bodyUser));
               //navigation.navigate('SaveSessionQuestion');

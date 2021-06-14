@@ -9,6 +9,7 @@ import {
   TextInput,
   SafeAreaView,
   ActivityIndicator,
+  ScrollView
 } from 'react-native';
 
 import axios from 'axios';
@@ -19,13 +20,13 @@ import TopBar from '../shared/TopBar';
 import BottomBar from '../shared/BottomBarUser';
 
 import { openDatabase } from 'react-native-sqlite-storage';
-import { ScrollView } from 'react-native-gesture-handler';
+
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, Paragraph, Dialog, Portal } from 'react-native-paper';
+
 import { urlServer } from '../../services/urlServer';
 
 import  SideBarTrainer  from '../shared/SideBarTrainer';
@@ -77,9 +78,7 @@ const CreateGymScreen = ({navigation}) => {
   const [visible, setVisible] = useState(false); // alert
   const [mainIndicator, setMainIndicator] = useState(true);
 
-  const showDialog = () => setVisible(true);
 
-  const hideDialog = () => setVisible(false);
 
 
   useEffect(() => {
@@ -337,20 +336,7 @@ const CreateGymScreen = ({navigation}) => {
                   <Text style={styles.textButton}>Guardar</Text>
                 </TouchableOpacity>
               </View>
-  
-              <View>
-                <Portal>
-                  <Dialog visible={visible} onDismiss={hideDialog}>
-                    <Dialog.Title>Error</Dialog.Title>
-                    <Dialog.Content>
-                      <Paragraph>{errorMesssageAlert}</Paragraph>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                      <Button onPress={hideDialog}>Cerrar</Button>
-                    </Dialog.Actions>
-                  </Dialog>
-                </Portal>
-              </View>
+
   
             </View>
           </ScrollView>

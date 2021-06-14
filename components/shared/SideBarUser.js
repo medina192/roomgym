@@ -22,16 +22,23 @@ import * as Keychain from 'react-native-keychain';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { clearState } from '../../store/actions/actionsReducer';
+import { clearState, imageSliderCancel } from '../../store/actions/actionsReducer';
 
 const SideBarUser = ({navigation}) => {
 
     const dispatch = useDispatch();
 
+    const user = useSelector(state => state.user);
+
     const deleteSecureStorage = async() => {
+        dispatch(imageSliderCancel(true));
         dispatch(clearState());
         await Keychain.resetGenericPassword();
         navigation.navigate('Login');
+    }
+
+    const gotToRegisterScreen = () => {
+        navigation.navigate('Register');
     }
 
     return(
@@ -68,12 +75,26 @@ const SideBarUser = ({navigation}) => {
             <View style={styles.containerLine}>
                 <View style={styles.line}></View>
             </View>
-            <View style={styles.containerButtonLogOut}>
-                <TouchableOpacity style={styles.buttonLink} onPress={deleteSecureStorage}>
-                    <Icon name="share-square-o" size={24} style={styles.iconLink} color="#fff" />
-                    <Text style={styles.textLink}>Cerrar sesión</Text>
-                </TouchableOpacity>
-            </View>
+            {
+                user == '' ? 
+                (
+                    <View style={styles.containerButtonLogOut}>
+                        <TouchableOpacity style={styles.buttonLink} onPress={gotToRegisterScreen}>
+                            <Icon name="share-square-o" size={24} style={styles.iconLink} color="#fff" />
+                            <Text style={styles.textLink}>Registrarte</Text>
+                        </TouchableOpacity>
+                    </View>
+                )
+                :
+                (
+                    <View style={styles.containerButtonLogOut}>
+                        <TouchableOpacity style={styles.buttonLink} onPress={deleteSecureStorage}>
+                            <Icon name="share-square-o" size={24} style={styles.iconLink} color="#fff" />
+                            <Text style={styles.textLink}>Cerrar sesión</Text>
+                        </TouchableOpacity>
+                    </View>
+                )
+            }
         </>
     );
 } 

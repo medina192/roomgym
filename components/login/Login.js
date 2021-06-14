@@ -33,6 +33,8 @@ import { urlServer } from '../../services/urlServer';
 
 import AlertComponent from '../shared/AlertComponent';
 
+
+
 const Login = ({navigation}) => {
 
   const dispatch = useDispatch();
@@ -52,8 +54,7 @@ const Login = ({navigation}) => {
     nextScreen: 'MyGymTrainer'
   });
 
-  const wer = useSelector(state => state);
-  console.log('------------ user screen', wer);
+
 
   useEffect(() => {
 
@@ -168,10 +169,20 @@ const Login = ({navigation}) => {
 
           if(rol == '1'){
             dispatch(saveUser(userObject));
+            setform({
+              email: '',
+              password: ''
+            });
+            setIsEnabled(false);
             navigation.navigate('MainUserScreen');
           }
           else{
             dispatch(T_saveTrainer(userObject));
+            setform({
+              email: '',
+              password: ''
+            });
+            setIsEnabled(false);
             navigation.navigate('MainTrainerScreen');
           }
 
@@ -206,7 +217,7 @@ const Login = ({navigation}) => {
             method: 'get',
             url: `${serverUrl}/auth/getRol/${auxIdusuario}`
           }).then((resp) => {
-            //console.log(resp.data.resp[0].idrol);
+            console.log(resp.data.resp[0].idrol);
 
             if(isEnabled)
             {
@@ -229,11 +240,21 @@ const Login = ({navigation}) => {
               {
                 setMainIndicator(false);
                 dispatch(saveUser(userObject));
+                setform({
+                  email: '',
+                  password: ''
+                });
+                setIsEnabled(false);
                 navigation.navigate('MainUserScreen');
               }
               else{
                 setMainIndicator(false);
                 dispatch(T_saveTrainer(userObject));
+                setform({
+                  email: '',
+                  password: ''
+                });
+                setIsEnabled(false);
                 navigation.navigate('MainTrainerScreen');
               }
             }
@@ -243,7 +264,7 @@ const Login = ({navigation}) => {
           });
       })
       .catch(function (error) {
-          //console.log('error axios',error);
+          console.log('error axios',error);
           //showDialog();
           setMainIndicator(false);
           if(error.request._response.slice(0,17) === 'Failed to connect')
@@ -347,6 +368,7 @@ const Login = ({navigation}) => {
           <TextInput style={styles.inputRegister}
             placeholder="Email"
             placeholderTextColor={Colors.MainBlue}
+            value={form.email}
             onChangeText={ (text) => saveInputsValues('email',text) }
           />
         </View>
@@ -356,6 +378,7 @@ const Login = ({navigation}) => {
             placeholder="Contraseña"
             secureTextEntry={true}
             placeholderTextColor={Colors.MainBlue}
+            value={form.password}
             onChangeText={ (text) => saveInputsValues('password',text) }
           />
         </View>

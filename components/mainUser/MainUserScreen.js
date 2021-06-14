@@ -35,7 +35,7 @@ import { openDatabase } from 'react-native-sqlite-storage';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { changeState } from '../../store/actions/actionsReducer';
+import { changeState, imageSliderCancel } from '../../store/actions/actionsReducer';
 
 const db = openDatabase({ name: 'roomGym.db' });
 
@@ -58,9 +58,7 @@ const UserScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-  const user = useSelector(state => state.user)
-
-
+  const user = useSelector(state => state.user);
 
   const [stopImageSlider, setStopImageSlider] = useState(false);
 
@@ -79,10 +77,11 @@ const UserScreen = ({navigation}) => {
         console.log('notification background', JSON.stringify(remoteMessage))
       });
 
-      return (unsubscribe,background) => {
-        unsubscribe();
+      dispatch(imageSliderCancel(false));
+      return () => {
+        //unsubscribe();
         //topicSubscriber();
-        background();
+        //background();
         setStopImageSlider(true);
         dispatch(changeState(!state));
       }
@@ -273,9 +272,6 @@ const UserScreen = ({navigation}) => {
             temp.push(results.rows.item(i));
             console.log('results---', results.rows.item(i));
           }
-
-
- 
         }
       );
  

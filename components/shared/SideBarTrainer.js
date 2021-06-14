@@ -52,6 +52,14 @@ const SideBarTrainer = ({navigation}) => {
                     <Icon name="user-o" size={24} style={styles.iconLink} color="#fff" />
                     <Text style={styles.textLink}>Mi perfil</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('MyGymTrainer')}>
+                    <Icon name="home" size={24} style={styles.iconLink} color="#fff" />
+                    <Text style={styles.textLink}>Actualizar Gimnasio</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('CreateGym')}>
+                    <Icon name="heart" size={24} style={styles.iconLink} color="#fff" />
+                    <Text style={styles.textLink}>Nuevo Gimnasio</Text>
+                </TouchableOpacity>
             </View>
             <View style={styles.containerLine}>
                 <View style={styles.line}></View>

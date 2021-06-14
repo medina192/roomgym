@@ -69,8 +69,13 @@ export default function UserDocuments() {
 
 const UserDocumentsScreen = ({navigation}) => {
 
+  const dispatch = useDispatch();
+
+  const user = useSelector(state => state.user);
+
   const [userDocuments, setUserDocuments] = useState([]);
   const [state, setState] = useState(false);
+  const [notRegisterUser, setNotRegisterUser] = useState(false);
 
   useEffect(() => {
     const createTable = () => {
@@ -97,7 +102,13 @@ const UserDocumentsScreen = ({navigation}) => {
       console.log('SQLite Database and Table Successfully Created...');
     };
 
-    getData();
+    if(user == '')
+    {
+      setNotRegisterUser(true);
+    }
+    else{
+      getData();
+    }
     //createTable();
   }, [])
 
@@ -145,58 +156,69 @@ const UserDocumentsScreen = ({navigation}) => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'fff'}}>
         <TopBar navigation={navigation} title={`Bienvenido Usuario`} returnButton={true} />
-          <ScrollView style={{flex: 1}}>
-              {
-                userDocuments.length > 0 ? 
-                (
-                  <View style={styles.containerCards}>
-                    <Text>Videos</Text>
-                    {
-                      userDocuments.map((document, indexVideo) => {
+        {
+          notRegisterUser ? 
+          (
+            <View style={{padding: 10, flex: 1}}>
+              <Text style={styles.textNotRegister}>No puedes tener documentos guardados hasta que te registres</Text>
+            </View>
+          )
+          :
+          (
+            <ScrollView style={{flex: 1}}>
+            {
+              userDocuments.length > 0 ? 
+              (
+                <View style={styles.containerCards}>
+                  <Text>Videos</Text>
+                  {
+                    userDocuments.map((document, indexVideo) => {
 
-                        const index___ = document.nameDocument.search('___');
-                        const justName = document.nameDocument.slice(0, index___);
+                      const index___ = document.nameDocument.search('___');
+                      const justName = document.nameDocument.slice(0, index___);
 
-                        if(document.type =='video')
-                        {
-                          return(
-                            <TouchableOpacity 
-                              onPress={ () => navigation.navigate('WatchVideo',{document: {}, downloadedFile: document, downloadedFileBoolean: true})}
-                              key={indexVideo} style={styles.cardDocument} >
-                              <Text style={styles.textNameCard}>{justName}</Text>
-                            </TouchableOpacity>
-                          )
-                        }
-                      })
-                    }
+                      if(document.type =='video')
+                      {
+                        return(
+                          <TouchableOpacity 
+                            onPress={ () => navigation.navigate('WatchVideo',{document: {}, downloadedFile: document, downloadedFileBoolean: true})}
+                            key={indexVideo} style={styles.cardDocument} >
+                            <Text style={styles.textNameCard}>{justName}</Text>
+                          </TouchableOpacity>
+                        )
+                      }
+                    })
+                  }
 
-                    <Text>Pdfs</Text>
-                    {
-                      userDocuments.map((document, indexPdf) => {
+                  <Text>Pdfs</Text>
+                  {
+                    userDocuments.map((document, indexPdf) => {
 
-                        const index___ = document.nameDocument.search('___');
-                        const justName = document.nameDocument.slice(0, index___);
+                      const index___ = document.nameDocument.search('___');
+                      const justName = document.nameDocument.slice(0, index___);
 
-                        if(document.type =='pdf')
-                        {
-                          return(
-                            <TouchableOpacity 
-                              onPress={ () => navigation.navigate('WatchPdf',{document: {}, downloadedFile: document, downloadedFileBoolean: true})}
-                              key={indexPdf} style={styles.cardDocument} >
-                              <Text style={styles.textNameCard}>{justName}</Text>
-                            </TouchableOpacity>
-                          )
-                        }
-                      })
-                    }
-                  </View>
-                )
-                :
-                (
-                  <Text>No has desgargado nada aún</Text>
-                )
-              }
-          </ScrollView>
+                      if(document.type =='pdf')
+                      {
+                        return(
+                          <TouchableOpacity 
+                            onPress={ () => navigation.navigate('WatchPdf',{document: {}, downloadedFile: document, downloadedFileBoolean: true})}
+                            key={indexPdf} style={styles.cardDocument} >
+                            <Text style={styles.textNameCard}>{justName}</Text>
+                          </TouchableOpacity>
+                        )
+                      }
+                    })
+                  }
+                </View>
+              )
+              :
+              (
+                <Text style={styles.textNotDocuments}>No has desgargado nada aún</Text>
+              )
+            }
+        </ScrollView>
+          )
+        }
         <BottomBar navigation={navigation}/>
     </SafeAreaView>
   );
@@ -230,4 +252,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff'
   },
+
+  textNotRegister:{
+    fontSize: 16,
+    backgroundColor: Colors.MainBlue,
+    color: '#fff',
+    padding: 10
+  },
+
+  textNotDocuments:{
+    fontSize: 16,
+    backgroundColor: '#999',
+    color: '#fff',
+    padding: 10,
+    width: Dimensions.get('window').width * 0.8,
+    marginTop: 15,
+    textAlign: 'center'
+  },
 });
+   

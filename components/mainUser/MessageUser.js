@@ -22,27 +22,29 @@ import BottomBar from '../shared/BottomBarUser';
 
 import Colors  from '../../colors/colors';
 
+import SideBarUser from '../shared/SideBarUser';
+
 
 const Drawer = createDrawerNavigator();
 
-/*
-export default function MessageUser({navigation, route}) {
+
+export default function MessageUser({navigation}) {
 
 
   return (
     <>
       <Drawer.Navigator drawerContent={(props) => <SideBarUser {...props} />}>
-        <Drawer.Screen name="MessageUser" component={(props) => <MessageUserScreen />} trainer={route.params.trainer}/>
+        <Drawer.Screen name="MessageUser" component={MessageUserScreen}/>
       </Drawer.Navigator>
     </>
   );
 }
-*/
+
 
 import { urlServer } from '../../services/urlServer';
 
 
-const MessageUser = ({navigation, route}) => {
+const MessageUserScreen = ({navigation, route}) => {
 
 
   const serverUrl = urlServer.url;
@@ -165,6 +167,7 @@ const MessageUser = ({navigation, route}) => {
     .then(function (response) {
       console.log('quiero',response.data.resp);
       loadMessages();
+      setMessage('');
       //setMessagesLoaded(false);
     })
     .catch(function (error) {
@@ -218,7 +221,7 @@ const MessageUser = ({navigation, route}) => {
                               //console.log('if');
                               return(
                                 <View style={styles.containerMessageUser}>
-                                  <View style={styles.message}>
+                                  <View style={styles.myMessage}>
                                     <Text style={styles.textMessage}>{message.item.message}</Text>  
                                   </View>
                                 </View>
@@ -251,9 +254,6 @@ const MessageUser = ({navigation, route}) => {
               />
             <TouchableOpacity style={styles.buttonSubscribe} onPress={ buttonSendMessage}>
               <Text style={styles.textButoonSubscribe}>Enviar mensaje</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonSubscribe} onPress={changeState}>
-              <Text style={styles.textButoonSubscribe}>Change state</Text>
             </TouchableOpacity>
           <BottomBar navigation={navigation}/>
         </View>
@@ -313,6 +313,16 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6
   },  
+  myMessage: {
+    backgroundColor: '#39ff5a',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    maxWidth: '80%',
+    borderBottomRightRadius: 6,
+    borderBottomLeftRadius: 6,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6
+  },  
   textMessage:{
     fontSize: 15
   },
@@ -358,5 +368,3 @@ const styles = StyleSheet.create({
       fontWeight: '700'
     },
 });
-
-export default MessageUser;

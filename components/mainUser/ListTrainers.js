@@ -150,7 +150,6 @@ const ListTrainersScreen = ({navigation}) => {
     allTrainers();
   }
 
-  console.log('state');
   return (
     <>
       <View style={styles.containerListTrainers}>

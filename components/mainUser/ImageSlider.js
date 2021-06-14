@@ -5,20 +5,29 @@ import {
   Image,
 } from 'react-native';
 
+import { useDispatch, useSelector } from 'react-redux';
+
+import { changeState, imageSliderCancel } from '../../store/actions/actionsReducer';
 
 const ImageSlider = ({stopImageSlider}) => {
 
     const [carrusel, setCarrusel] = useState(1);
 
+    const imageSlider = useSelector(state => state.imageSliderCancel);
+
+
     setTimeout(() => {
-      if(!stopImageSlider)
+      if(!imageSlider)
       {
-        if(carrusel === 5)
+        if(!stopImageSlider)
         {
-          setCarrusel(1);
-        }
-        else{
-          setCarrusel(carrusel + 1);
+          if(carrusel === 5)
+          {
+            setCarrusel(1);
+          }
+          else{
+            setCarrusel(carrusel + 1);
+          }
         }
       }
     }, 2000);

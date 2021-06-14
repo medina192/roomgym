@@ -5,6 +5,8 @@ import {
   Text,
   ActivityIndicator,
   TouchableOpacity,
+  ImageBackground,
+  Dimensions
 } from 'react-native';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -100,7 +102,7 @@ const AskScreen = ({navigation}) => {
 
     return (
         <>
-            {
+           {
              mainIndicator ? 
              (
               <View style={styles.containerIndicator}>
@@ -113,18 +115,20 @@ const AskScreen = ({navigation}) => {
              ) 
              :
              (
-              <View style={styles.containerAskScreen}>
-                  <Text style={styles.textQuestion}>¿Deseas registrarte o iniciar sesión?</Text>
-                  <TouchableOpacity style={styles.buttonRegisterLogin} onPress={() => changeScreen('Login')} >
-                      <Text style={styles.textButttonregisterLogin}>Iniciar sesión</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.buttonRegisterLogin} onPress={() => changeScreen('Register')} >
-                      <Text style={styles.textButttonregisterLogin}>Registrarme</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.buttonContinue} onPress={() => changeScreen('MainUserGeneralScreen')} >
-                      <Text style={styles.textButtonConitnue}>Continuar sin registrarme</Text>
-                  </TouchableOpacity>
-              </View>
+              <ImageBackground source={ require('../../assets/img/background_question.jpg')} style={styles.backgroundImage}>
+                <View style={styles.containerAskScreen}>
+                    <Text style={styles.textQuestion}>¿Deseas registrarte o iniciar sesión?</Text>
+                    <TouchableOpacity style={styles.buttonRegisterLogin} onPress={() => changeScreen('Login')} >
+                        <Text style={styles.textButttonregisterLogin}>Iniciar sesión</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonRegisterLogin} onPress={() => changeScreen('Register')} >
+                        <Text style={styles.textButttonregisterLogin}>Registrarme</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonContinue} onPress={() => changeScreen('MainUserGeneralScreen')} >
+                        <Text style={styles.textButtonConitnue}>Continuar sin registrarme</Text>
+                    </TouchableOpacity>
+                </View>
+              </ImageBackground>
              )
             }
         </>
@@ -143,26 +147,37 @@ const styles = StyleSheet.create({
       flex: 1
     },
 
+    backgroundImage:{
+      flex: 1,
+      resizeMode: "cover",
+      justifyContent: "center",
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height,
+    },
 
     containerAskScreen: {
         flex: 1,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: 10
     },
     textQuestion:{
         fontSize: 22,
         marginBottom: 15,
+        color: '#fff',
+        backgroundColor: '#FFA50044',
+        borderBottomRightRadius: 5,
+        borderBottomLeftRadius: 5,
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5
     },
     buttonRegisterLogin:{
         backgroundColor: Colors.MainBlue,
         width: '70%',
         paddingVertical: 10,
         marginVertical: 8,
-        borderBottomRightRadius: 5,
-        borderBottomLeftRadius: 5,
-        borderTopLeftRadius: 5,
-        borderTopRightRadius: 5
+
     },
     textButttonregisterLogin:{
         fontSize: 18,

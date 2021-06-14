@@ -12,6 +12,7 @@ const initialState = {
     currentRoutine: {},
     currentExercise: {},
     changeState: false,
+    imageSliderCancel: false
 }
 
 export const mainReducer = (state = initialState, action) => {
@@ -86,6 +87,11 @@ export const mainReducer = (state = initialState, action) => {
                 currentExercise: {},
                 changeState: false,
             }   
+        case types.imageSliderCancel:
+            return{
+                ...state,
+                imageSliderCancel: action.payload.cancel
+            }
         break;
     
         default:

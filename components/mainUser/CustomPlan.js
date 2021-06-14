@@ -16,8 +16,6 @@ import TopBar from '../shared/TopBar';
 
 import {urlServer} from '../../services/urlServer';
 
-import { createDrawerNavigator } from '@react-navigation/drawer';
-
 import SideBarUser from '../shared/SideBarUser';
 import  Colors  from '../../colors/colors';
 
@@ -25,6 +23,11 @@ import { saveCurrentRoutine } from '../../store/actions/actionsReducer';
 
 import BottomBar from '../shared/BottomBarUser';
 
+import { openDatabase } from 'react-native-sqlite-storage';
+
+const db = openDatabase({ name: 'roomGym.db' });
+
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 const Drawer = createDrawerNavigator();
 
@@ -47,6 +50,8 @@ const CustomPlanScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
+  const user = useSelector(state => state.user)
+
   const [routines, setRoutines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshState, setRefreshState] = useState(false);
@@ -54,11 +59,37 @@ const CustomPlanScreen = ({navigation}) => {
 
   useEffect(() => {
     
-    getRoutines();
+    if(user == '')
+    {
+      getRoutinesGeneralUser();
+    }
+    else{
+      getRoutines();
+    }
   }, []);
 
-  const user = useSelector(state => state.user);
 
+  const getRoutinesGeneralUser = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM GeneralUser',
+        [],
+        (tx, results) => {
+          console.log('results', results);
+          var temp = [];
+          for (let i = 0; i < results.rows.length; ++i)
+          {
+            temp.push(results.rows.item(i));
+            console.log('results---', results.rows.item(i));
+          }
+          setLoading(false);
+          getTrainersOfRoutines(temp);
+        }
+      );
+ 
+    });
+  }
+ 
 
 
   const getRoutines = async() => {
@@ -119,9 +150,9 @@ const CustomPlanScreen = ({navigation}) => {
   return (
     <View style={{flex: 1, position: 'relative'}}>
       <TopBar navigation={navigation} title={`Mi plan personalizado`} returnButton={true} />
-      <ScrollView style={{flex: 1}}>
 
-       {
+      <View style={{flex: 1}}>
+      {
          !loading ?
          (
            <>
@@ -147,7 +178,23 @@ const CustomPlanScreen = ({navigation}) => {
                 )
                 :
                 (
-                  <Text>No tienes rutinas guardadas aún</Text>
+                  <View>
+                    {
+                      user == '' ? 
+                      (
+                        <Text style={styles.textNoTrainerRoutines}>
+                          Para que un entrenador pueda asignarte rutinas, debes registrarte y 
+                          suscribirte a el
+                        </Text>
+                      )
+                      :
+                      (
+                        <Text style={styles.textNoTrainerRoutines}>
+                          Tu entrenador no te ha asignado rutinas aún
+                        </Text>
+                      )
+                    }
+                  </View>
                 )
               }
               </View>
@@ -171,7 +218,9 @@ const CustomPlanScreen = ({navigation}) => {
                 )
                 :
                 (
-                  <Text>No tienes rutinas guardadas aún</Text>
+                  <View>
+                      <Text style={styles.textNoTrainerRoutines}>No has creado rutinas aún</Text>
+                  </View>
                 )
               }
               </View>
@@ -188,8 +237,9 @@ const CustomPlanScreen = ({navigation}) => {
           </View>
          )
        }
-      </ScrollView>
-      <BottomBar/>
+      </View>
+
+      <BottomBar navigation={navigation}/>
     </View>
   );
 };
@@ -200,16 +250,16 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1
+    flex: 1,
   },
 
   containerAllRoutines:{
-    flex: 1,
     width: '100%',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 15
+    paddingVertical: 15,
+    paddingHorizontal: 10
   },
   containerIconInput:{
     display: 'flex',
@@ -261,5 +311,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 8,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
-  }
+  },
+
+  textNoTrainerRoutines:{
+    backgroundColor: Colors.MainBlue,
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    padding: 10,
+    marginTop: 10,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+  },
+
+
 });

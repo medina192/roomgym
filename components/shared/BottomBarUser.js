@@ -15,7 +15,15 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Colors from '../../colors/colors';
 
+import { useDispatch, useSelector } from 'react-redux';
+
+
 const BottomBar = ({ navigation}) => {
+
+  const dispatch = useDispatch();
+
+  const user = useSelector(state => state.user);
+  const T_trainer = useSelector(state => state.T_trainer);
 
     const changeUserScreen = (newScreen) => {
         navigation.navigate(newScreen);
@@ -24,20 +32,42 @@ const BottomBar = ({ navigation}) => {
 
   return (
     <>
-      <View style={styles.containerBottomBar}>
-          <TouchableOpacity onPress={() => changeUserScreen('Routines')}>
-            <Icon name="envelope" size={24} style={styles.iconBottomBar} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => changeUserScreen('ListTrainers')}>
-            <Icon name="group" size={24} style={styles.iconBottomBar} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => changeUserScreen('CustomPlan')}>
-            <Icon name="bar-chart-o" size={24} style={styles.iconBottomBar} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => changeUserScreen('Statistics')}>
-            <Icon name="user-o" size={24} style={styles.iconBottomBar} color="#fff" />
-          </TouchableOpacity>
-      </View>
+      {
+        !T_trainer == '' ? 
+        (
+          <View style={styles.containerBottomBar}>
+            <TouchableOpacity onPress={() => changeUserScreen('ListUsers')}>
+              <Icon name="group" size={24} style={styles.iconBottomBar} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => changeUserScreen('MainTrainerScreen')}>
+              <Icon name="user-o" size={24} style={styles.iconBottomBar} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => changeUserScreen('MyGymTrainer')}>
+              <Icon name="home" size={24} style={styles.iconBottomBar} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => changeUserScreen('CreateGym')}>
+              <Icon name="heart" size={24} style={styles.iconBottomBar} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        )
+        :
+        (
+          <View style={styles.containerBottomBar}>
+            <TouchableOpacity onPress={() => changeUserScreen('Routines')}>
+              <Icon name="envelope" size={24} style={styles.iconBottomBar} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => changeUserScreen('ListTrainers')}>
+              <Icon name="group" size={24} style={styles.iconBottomBar} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => changeUserScreen('CustomPlan')}>
+              <Icon name="check" size={24} style={styles.iconBottomBar} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={user == '' ? () => changeUserScreen('StatisticsUserGeneral') : () => changeUserScreen('Statistics')}>
+              <Icon name="bar-chart-o" size={24} style={styles.iconBottomBar} color="#fff" />
+            </TouchableOpacity>
+        </View>
+        )
+      }
     </>
   );
 };

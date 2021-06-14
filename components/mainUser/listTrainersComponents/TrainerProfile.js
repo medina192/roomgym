@@ -49,6 +49,9 @@ const TrainerProfileScreen = ({navigation}) => {
 
   const dispatch = useDispatch();
 
+  const trainer = useSelector(state => state.trainer);
+  const user = useSelector(state => state.user);
+
   const [userSubscribed, setUserSubscribed] = useState({
     state_subscription: 0,
     userSubscribedStatus: false
@@ -65,7 +68,15 @@ const TrainerProfileScreen = ({navigation}) => {
   useEffect(() => {
     verifyRelation();
     getTrainerDocuments();
-    getDownloadedFiles();
+
+    if(user == '')
+    {
+
+    }
+    else{
+      getDownloadedFiles();
+    }
+
   }, []);
 
   const getDownloadedFiles = () => {
@@ -90,7 +101,7 @@ const TrainerProfileScreen = ({navigation}) => {
     });
   }
 
-  console.log('set', downloadedFiles.files[0]);
+
 
   const verifyRelation = () => {
     axios({
@@ -157,41 +168,47 @@ const TrainerProfileScreen = ({navigation}) => {
   }
 
 
-  const trainer = useSelector(state => state.trainer);
-  const user = useSelector(state => state.user);
+
 
   const subscribe = () => {
-    const dateSubscription = new Date();
-    const dateShortFormat = dateSubscription.toISOString();
-    const dateMysqlFormat = dateShortFormat.slice(0,10);
 
-    axios({
-      method: 'post',
-      url: `${serverUrl}/relations/registerRelation`,
-      data: {
-        idUsuario: user.idusuario,
-        idEntrenador: trainer.idusuario,
-        email_usuario: user.email,
-        email_entrenador: trainer.email,
-        email_usuario_entrenador: `${user.email+trainer.email}`,
-        fecha_subscripcion: dateMysqlFormat,
-        estado_subscripcion: 1
-      }
-    })
-    .then(function (response) {
-      //console.log('response', response.data);
-      verifyRelation();
-      
-      setUserSubscribed({
-        state_subscription: 0,
-        userSubscribedStatus: true
+    if(user == '')
+    {
+      console.log('subscribe');
+    }
+    else{
+      const dateSubscription = new Date();
+      const dateShortFormat = dateSubscription.toISOString();
+      const dateMysqlFormat = dateShortFormat.slice(0,10);
+  
+      axios({
+        method: 'post',
+        url: `${serverUrl}/relations/registerRelation`,
+        data: {
+          idUsuario: user.idusuario,
+          idEntrenador: trainer.idusuario,
+          email_usuario: user.email,
+          email_entrenador: trainer.email,
+          email_usuario_entrenador: `${user.email+trainer.email}`,
+          fecha_subscripcion: dateMysqlFormat,
+          estado_subscripcion: 1
+        }
+      })
+      .then(function (response) {
+        //console.log('response', response.data);
+        verifyRelation();
+        
+        setUserSubscribed({
+          state_subscription: 0,
+          userSubscribedStatus: true
+        });
+        setState(!state);
+        
+      })
+      .catch(function (error) {
+          console.log('error axios',error);
       });
-      setState(!state);
-      
-    })
-    .catch(function (error) {
-        console.log('error axios',error);
-    });
+    }
   }
 
 
@@ -347,7 +364,7 @@ const TrainerProfileScreen = ({navigation}) => {
                           }
 
                           return(
-                            <TouchableOpacity 
+                            <TouchableOpacity key={indexDocument}
                               onPress={ () => navigation.navigate('WatchVideo',{ document, downloadedFile, downloadedFileBoolean})}
                               style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
                               <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
@@ -399,7 +416,7 @@ const TrainerProfileScreen = ({navigation}) => {
                           }
 
                           return(
-                            <TouchableOpacity 
+                            <TouchableOpacity  key={indexDocument}
                               onPress={ () => navigation.navigate('WatchPdf',{ document, downloadedFile,downloadedFileBoolean})}
                               style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
                               <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
@@ -424,14 +441,14 @@ const TrainerProfileScreen = ({navigation}) => {
                   <View>
                     <Text  style={{fontSize: 16, fontWeight: '700', marginTop: 10, marginBottom: 5}}>Imagenes</Text>
                     {
-                      documents.map( (document, indexDocument) => {
+                      documents.map( (document, indexImage) => {
 
                         if(document.tipo === 'image')
                         {
                           const index___ = document.nombreDocumento.search('___');
                           const justName = document.nombreDocumento.slice(0, index___);
                           return(
-                            <Image width={100} height={50} source={{uri: document.url,
+                            <Image  key={indexImage} width={100} height={50} source={{uri: document.url,
                             width: 300, 
                             height: 300}} />
                           )

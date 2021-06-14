@@ -22,27 +22,29 @@ import BottomBar from '../shared/BottomBarUser';
 
 import Colors  from '../../colors/colors';
 
+import SideBarTrainer from '../shared/SideBarTrainer';
+
 
 const Drawer = createDrawerNavigator();
 
-/*
-export default function MessageUser({navigation, route}) {
+
+export default function MessageTrainer({navigation}) {
 
 
   return (
     <>
-      <Drawer.Navigator drawerContent={(props) => <SideBarUser {...props} />}>
-        <Drawer.Screen name="MessageUser" component={(props) => <MessageUserScreen />} trainer={route.params.trainer}/>
+      <Drawer.Navigator drawerContent={(props) => <SideBarTrainer {...props} />}>
+        <Drawer.Screen name="MessageTrainer" component={MessageTrainerScreen}/>
       </Drawer.Navigator>
     </>
   );
 }
-*/
+
 
 import { urlServer } from '../../services/urlServer';
 
 
-const MessageTrainer = ({navigation, route}) => {
+const MessageTrainerScreen = ({navigation}) => {
 
 
   const serverUrl = urlServer.url;
@@ -58,7 +60,7 @@ const MessageTrainer = ({navigation, route}) => {
   const userInformation = useSelector(state => state.T_user);
   const trainerInformation = useSelector(state => state.T_trainer);
   const idRelation = useSelector(state => state.idRelation);
-
+  console.log(userInformation);
 
   useEffect(() => {
     loadMessages();
@@ -145,14 +147,14 @@ const MessageTrainer = ({navigation, route}) => {
   }
 
   const sendMessage = () => {
-
+    console.log('send',trainerInformation);
    if(message)
    {
     const objectMessages = JSON.stringify(listMessages);
     const bodyMessage = {
       id_relacion_entrenador_usuario: idRelation,
       idUsuario: userInformation.idUsuario,
-      idEntrenador: trainerInformation.id,
+      idEntrenador: trainerInformation.idusuario,
       mensajes_string: objectMessages,
       lengthMessages: listMessages.lengthOldMessages
     }
@@ -165,6 +167,7 @@ const MessageTrainer = ({navigation, route}) => {
     .then(function (response) {
       console.log('quiero',response.data.resp);
       loadMessages();
+      setMessage('');
       //setMessagesLoaded(false);
     })
     .catch(function (error) {
@@ -197,7 +200,7 @@ const MessageTrainer = ({navigation, route}) => {
     <>
       <TouchableWithoutFeedback onPress={hideKeyBoard}>
         <View style={styles.containerListTrainers}>
-          <TopBar navigation={navigation} title={userInformation.email_usuario} returnButton={true} />
+          <TopBar navigation={navigation} title={'Usuario'} returnButton={true} />
               {
                 !listMessages.messages.length === 0  ?
                 (
@@ -218,7 +221,7 @@ const MessageTrainer = ({navigation, route}) => {
                               //console.log('if');
                               return(
                                 <View style={styles.containerMessageUser}>
-                                  <View style={styles.message}>
+                                  <View style={styles.myMessage}>
                                     <Text style={styles.textMessage}>{message.item.message}</Text>  
                                   </View>
                                 </View>
@@ -251,9 +254,6 @@ const MessageTrainer = ({navigation, route}) => {
               />
             <TouchableOpacity style={styles.buttonSubscribe} onPress={ buttonSendMessage}>
               <Text style={styles.textButoonSubscribe}>Enviar mensaje</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonSubscribe} onPress={changeState}>
-              <Text style={styles.textButoonSubscribe}>Change state</Text>
             </TouchableOpacity>
           <BottomBar navigation={navigation}/>
         </View>
@@ -313,6 +313,16 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6
   },  
+  myMessage: {
+    backgroundColor: '#39ff5a',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    maxWidth: '80%',
+    borderBottomRightRadius: 6,
+    borderBottomLeftRadius: 6,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6
+  },  
   textMessage:{
     fontSize: 15
   },
@@ -358,5 +368,3 @@ const styles = StyleSheet.create({
       fontWeight: '700'
     },
 });
-
-export default MessageTrainer;

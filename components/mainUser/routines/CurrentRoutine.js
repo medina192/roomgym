@@ -521,15 +521,35 @@ useEffect(() => {
                 {
                   currentExercise.repetitions == repetitionsAcomplished ? 
                   (
-                    <View style={styles.containerFinishMessage}>
-                      <Text style={styles.textFinishMessage}>Felicidades¡ Has terminado el ejercicio</Text>
-                      <Icon name="trophy" size={24} style={styles.iconImageTrophy} color="#fff" />
-                      <TouchableOpacity 
-                        onPress={saveProgress} 
-                        //disabled={dissabledButtonProgress}
-                        style={styles.containerButtonContinue}>
-                        <Text style={styles.textButtonConitnue}>Guardar Progreso</Text>          
-                      </TouchableOpacity>
+                    <View>
+                      {
+                        userInformation == '' ? 
+                        (
+                          <View style={styles.containerFinishMessage}>
+                            <Text style={styles.textFinishMessage}>Felicidades¡ Has terminado el ejercicio</Text>
+                            <Icon name="trophy" size={24} style={styles.iconImageTrophy} color="#fff" />
+                            <Text style={{fontSize: 16, color: '#fff', marginBottom: 5}}>Para guardar tu progreso, necesitas registrarte</Text>
+                            <TouchableOpacity 
+                              onPress={() => navigation.navigate('Register')} 
+                              style={styles.containerButtonContinue}>
+                              <Text style={styles.textButtonConitnue}>Registrarse</Text>          
+                            </TouchableOpacity>
+                          </View>
+                        )
+                        :
+                        (
+                          <View style={styles.containerFinishMessage}>
+                            <Text style={styles.textFinishMessage}>Felicidades¡ Has terminado el ejercicio</Text>
+                            <Icon name="trophy" size={24} style={styles.iconImageTrophy} color="#fff" />
+                            <TouchableOpacity 
+                              onPress={saveProgress} 
+                              disabled={dissabledButtonProgress}
+                              style={styles.containerButtonContinue}>
+                              <Text style={styles.textButtonConitnue}>Guardar Progreso</Text>          
+                            </TouchableOpacity>
+                          </View>
+                        )
+                      }
                     </View>
                   )
                   :

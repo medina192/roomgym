@@ -11,4 +11,5 @@ export const types = {
     currentExercise: 'currentExercise',
     changeState: 'changeState',
     clearState: 'clearState',
+    imageSliderCancel: 'imageSliderCancel'
 }
