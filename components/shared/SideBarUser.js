@@ -51,6 +51,10 @@ const SideBarUser = ({navigation}) => {
                 </View>
             </View>
             <View style={styles.containerLinks}>
+                <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('MainUserScreen')}>
+                    <Icon name="home" size={24} style={styles.iconLink} color="#fff" />
+                    <Text style={styles.textLink}>Inicio</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.buttonLink} onPress={ () => navigation.navigate('Routines')}>
                     <Icon name="trophy" size={24} style={styles.iconLink} color="#fff" />
                     <Text style={styles.textLink}>Rutinas</Text>

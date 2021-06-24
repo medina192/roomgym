@@ -398,17 +398,23 @@ const TrainerProfileScreen = ({navigation}) => {
                           return(
                             <TouchableOpacity key={indexDocument}
                               onPress={ () => navigation.navigate('WatchVideo',{ document, downloadedFile, downloadedFileBoolean, urlCloudinary})}
-                              style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
-                              <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
+                              style={styles.videoCard} key={indexDocument}>
+                                <View style={styles.nameFile}>
+                                  <Text style={{fontWeight: '700', color: '#fff', fontSize: 20}}>{justName}</Text>
+                                </View>
                               <View>
                                 {
                                   downloadedFileBoolean  ?
                                   (
-                                      <Text style={{backgroundColor: '#fff', padding: 5, color: Colors.MainBlue}}>Descargado</Text>
+                                    <View style={styles.fileDonloaded}>
+                                      <Text style={styles.downloaded}>Descargado</Text>
+                                    </View>
                                   )
                                   :
                                   (
-                                      <Text style={{backgroundColor: '#fff', padding: 5, color: Colors.MainBlue}}>No Descargado</Text>
+                                    <View style={styles.fileDonloaded}>
+                                      <Text style={styles.downloaded}>No Descargado</Text>
+                                    </View>
                                   )
                                 }
                               </View>
@@ -451,7 +457,7 @@ const TrainerProfileScreen = ({navigation}) => {
                             <TouchableOpacity  key={indexDocument}
                               onPress={ () => navigation.navigate('WatchPdf',{ document, downloadedFile,downloadedFileBoolean})}
                               style={{backgroundColor: Colors.MainBlue, marginVertical: 3, padding: 5}} key={indexDocument}>
-                              <Text style={{fontWeight: '700', color: '#fff'}}>{justName}</Text>
+                              <Text style={{fontWeight: '700', color: '#fff', fontSize: 25}}>{justName}</Text>
                               <View>
                                 {
                                   downloadedFileBoolean  ?
@@ -609,4 +615,34 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center'
   },
+
+
+  videoCard:{
+    backgroundColor: Colors.MainBlue, 
+    marginVertical: 3, 
+    padding: 5,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+  },
+  nameFile:{
+    display: 'flex',
+   flexDirection: 'row',
+   justifyContent: 'flex-start'
+  },
+  fileDonloaded:{
+    display: 'flex',
+   flexDirection: 'row',
+   justifyContent: 'flex-end'
+  },
+  downloaded:{
+    backgroundColor: '#fff', 
+    padding: 5, 
+    color: Colors.MainBlue,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+  }
 });

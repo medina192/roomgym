@@ -9,7 +9,8 @@ import {
   Button,
   Switch,
   Image,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from 'react-native';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -125,6 +126,9 @@ const TrainerScreen = ({navigation}) => {
     data: {}
   });
 
+  const [loadingPhoto, setLoadingPhoto] = useState(false);
+  const [loadingVideo, setLoadingVideo] = useState(false);
+
   const [disableButton, setDisableButton] = useState(false);
 
 
@@ -159,6 +163,8 @@ const TrainerScreen = ({navigation}) => {
 
   const uploadImage = async (data) => {
     
+    setLoadingPhoto(true);
+
     const fileToUpload = {
       uri: data.uri,
       type: data.type,
@@ -189,6 +195,8 @@ const TrainerScreen = ({navigation}) => {
 
     setDisableButton(true);
 
+    setLoadingPhoto(true);
+
     try {
 
       const formData = new FormData();
@@ -202,6 +210,7 @@ const TrainerScreen = ({navigation}) => {
         headers
       });
       
+      setLoadingPhoto(false);
       setDisableButton(false);
       setShowButtonPhoto(true);
       setImageNameInputValue('');
@@ -214,7 +223,9 @@ const TrainerScreen = ({navigation}) => {
      console.log('respones', resp);
     } catch (error) {
       console.log('error submiting image', error);
+      Alert.alert('La imagen no se pudo cargar');
       setDisableButton(false);
+      setLoadingPhoto(false);
     }
   }
 
@@ -302,7 +313,7 @@ const TrainerScreen = ({navigation}) => {
     }
 
     setDisableButton(true);
-
+    setLoadingVideo(true);
     try {
 
       const formData = new FormData();
@@ -315,6 +326,7 @@ const TrainerScreen = ({navigation}) => {
         data: formData,
         headers
       });
+      setLoadingVideo(false);
       setDisableButton(false);
       setShowButtonVideo(true);
       setVideoNameInputValue('');
@@ -327,6 +339,8 @@ const TrainerScreen = ({navigation}) => {
      console.log('respones', resp);
     } catch (error) {
       console.log('error submiting image', error);
+      Alert.alert('El video no se pudo cargar');
+      setLoadingVideo(false);
       setDisableButton(false);
     }
   }
@@ -702,12 +716,25 @@ const TrainerScreen = ({navigation}) => {
                     style={styles.containerIconButtonClose}>
                     <Icon name="angle-double-up" size={24} style={styles.iconButtonClose} color="#fff" />
                   </TouchableOpacity>
-                  <TouchableOpacity
-                      onPress={savePhoto}
-                      disabled={disableButton}
-                      style={styles.containerIconButtonAdd}>
-                      <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
-                  </TouchableOpacity>
+                  {
+                    loadingPhoto ? 
+                    (
+                      <ActivityIndicator
+                        size={50}
+                        color={Colors.MainBlue}
+                        style={styles.activityIndicator}
+                      />
+                    )
+                    :
+                    (
+                      <TouchableOpacity
+                        onPress={savePhoto}
+                        disabled={disableButton}
+                        style={styles.containerIconButtonAdd}>
+                        <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
+                      </TouchableOpacity>
+                    )
+                  }
             </View>              
 
           </View>
@@ -838,12 +865,25 @@ const TrainerScreen = ({navigation}) => {
                     style={styles.containerIconButtonClose}>
                     <Icon name="angle-double-up" size={24} style={styles.iconButtonClose} color="#fff" />
                   </TouchableOpacity>
-                  <TouchableOpacity
-                      onPress={saveVideo}
-                      disabled={disableButton}
-                      style={styles.containerIconButtonAdd}>
-                      <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
-                  </TouchableOpacity>
+                  {
+                    loadingVideo ? 
+                    (
+                      <ActivityIndicator
+                        size={50}
+                        color={Colors.MainBlue}
+                        style={styles.activityIndicator}
+                      />
+                    )
+                    :
+                    (
+                      <TouchableOpacity
+                        onPress={saveVideo}
+                        disabled={disableButton}
+                        style={styles.containerIconButtonAdd}>
+                        <Icon name="cloud-upload" size={24} style={styles.iconButtonAdd} color="#fff" />
+                      </TouchableOpacity>
+                    )
+                  }
               </View>              
 
             </View>

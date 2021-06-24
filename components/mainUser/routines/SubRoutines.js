@@ -226,7 +226,6 @@ const SubRoutinesScreen = ({navigation}) => {
     }
   }
 
-console.log('sub', subRoutine.routines);
   return (
     <View style={{flex: 1, position: 'relative'}}>
       <TopBar navigation={navigation} title={subRoutine.name} returnButton={true} />

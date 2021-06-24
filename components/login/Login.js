@@ -162,11 +162,11 @@ const Login = ({navigation}) => {
     const password = rol;
 
     const userObject = JSON.parse(user);
-  
+
     try {
           // Store the credentials
       await Keychain.setGenericPassword(username, password);
-
+      setMainIndicator(false);
           if(rol == '1'){
             dispatch(saveUser(userObject));
             setform({
@@ -188,6 +188,7 @@ const Login = ({navigation}) => {
 
     } catch (error) {
       console.log("Keychain couldn't be accessed!", error);
+      setMainIndicator(false);
     }
   }
 

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  ActivityIndicator
 } from 'react-native';
 
 import axios from 'axios';
@@ -38,12 +39,14 @@ const WatchVideo = ({navigation, route}) => {
   const dispatch = useDispatch();
 
   const [urlPdf, seturlPdf] = useState('');
+  const [loadingVideo, setLoadingVideo] = useState(true);
 
   const state = useSelector(state => state.changeStateForDocuments);
 
   useEffect(() => {
     if(route.params.downloadedFileBoolean)
     {
+      setLoadingVideo(false);
       seturlPdf(route.params.downloadedFile.urlInPhone);
     }
     else{
@@ -161,21 +164,16 @@ const WatchVideo = ({navigation, route}) => {
         });
       }
 
-      getData();
+      //getData();
 
-      const jeje = () => {
-        dispatch(changeStateForDocuments(!state));
-        console.log('aaaaaaaaaaa', state);
+      const videoLoaded = () => {
+        console.log('hi');
+        setLoadingVideo(false);
       }
 
   return (
-    <>
+    <View style={{flex: 1, position: 'relative'}}>
        <TopBar navigation={navigation} title={'Video'} returnButton={true} menu={false}/>
-       <TouchableOpacity 
-              onPress={jeje}
-              style={{backgroundColor: Colors.Orange, padding: 5, margin: 20}}>
-              <Text style={{color: '#fff', fontWeight: '700', fontSize: 16}}>change</Text>
-            </TouchableOpacity>
         {
           route.params.downloadedFileBoolean ? 
           (
@@ -204,6 +202,7 @@ const WatchVideo = ({navigation, route}) => {
               style={{ flex: 1 }}
               controls={true}
               resizeMode="contain"
+              onLoad={videoLoaded}
             />
             </View>
           )
@@ -213,8 +212,24 @@ const WatchVideo = ({navigation, route}) => {
             </>
           )
         }
-
-    </>
+        {
+          loadingVideo  ?
+          (
+            <View style={styles.containerIndicator}>
+            <ActivityIndicator
+              size={80}
+              color={Colors.MainBlue}
+              style={styles.activityIndicator}
+            />
+          </View>
+          )
+          :
+          (
+            <>
+            </>
+          )
+        }
+    </View>
   );
 
 };
@@ -222,6 +237,20 @@ const WatchVideo = ({navigation, route}) => {
 export default WatchVideo;
 
 const styles = StyleSheet.create({
+
+  containerIndicator:{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  activityIndicator:{
+
+  },
     containerTrainerCard:{
         paddingHorizontal: 15,
         paddingVertical: 20,

@@ -1010,7 +1010,7 @@ const StatisticsScreen = ({navigation}) => {
                 }
             </View>
         </ScrollView>
-      <BottomBarUser />
+      <BottomBarUser  navigation={navigation}/>
       {
         showComparison ? 
         (
